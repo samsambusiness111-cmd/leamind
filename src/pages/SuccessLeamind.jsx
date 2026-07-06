@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/api/supabaseClient";
 import { getCurrentUser } from "@/lib/auth";
@@ -7,23 +7,26 @@ export default function SuccessLeamind() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const paymentId = searchParams.get("razorpay_payment_id");
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     const activateSubscription = async () => {
       try {
         const user = await getCurrentUser();
         if (!user) {
+          console.error("No user found");
           navigate("/");
           return;
         }
 
         if (!paymentId) {
+          console.error("No payment ID found");
           navigate("/");
           return;
         }
 
-        // 1. Check if user already has a progress record
+        const expires = new Date(Date.now() + 28 * 24 * 60 * 60 * 1000).toISOString();
+
+        // ✅ 1. Check if user already has a progress record
         let { data: existing, error: fetchError } = await supabase
           .from("user_progress")
           .select("*")
@@ -32,16 +35,13 @@ export default function SuccessLeamind() {
 
         if (fetchError && fetchError.code !== "PGRST116") {
           console.error("Fetch error:", fetchError);
-          setError("Failed to load your account. Please contact support.");
+          navigate("/");
           return;
         }
 
-        const expires = new Date(Date.now() + 28 * 24 * 60 * 60 * 1000).toISOString();
-
-        let result;
+        // ✅ 2. If record exists, UPDATE it
         if (existing) {
-          // Update existing record
-          const { data, error } = await supabase
+          const { error: updateError } = await supabase
             .from("user_progress")
             .update({
               subscription_status: "active",
@@ -49,19 +49,17 @@ export default function SuccessLeamind() {
               last_payment_id: paymentId,
               enrolled: true,
             })
-            .eq("id", existing.id)
-            .select()
-            .single();
+            .eq("id", existing.id);
 
-          if (error) {
-            console.error("Update error:", error);
-            setError("Failed to activate your subscription. Please contact support.");
+          if (updateError) {
+            console.error("Update error:", updateError);
+            navigate("/");
             return;
           }
-          result = data;
-        } else {
-          // Create new record
-          const { data, error } = await supabase
+        } 
+        // ✅ 3. If NO record exists, CREATE one
+        else {
+          const { error: insertError } = await supabase
             .from("user_progress")
             .insert({
               user_id: user.id,
@@ -74,62 +72,41 @@ export default function SuccessLeamind() {
               subscription_status: "active",
               subscription_expires: expires,
               last_payment_id: paymentId,
-            })
-            .select()
-            .single();
+            });
 
-          if (error) {
-            console.error("Insert error:", error);
-            setError("Failed to activate your subscription. Please contact support.");
+          if (insertError) {
+            console.error("Insert error:", insertError);
+            navigate("/");
             return;
           }
-          result = data;
         }
 
-        // 2. VERIFY the update was successful
-        const { data: verified, error: verifyError } = await supabase
+        // ✅ 4. VERIFY the update was successful
+        const { data: verify, error: verifyError } = await supabase
           .from("user_progress")
-          .select("*")
+          .select("subscription_status")
           .eq("user_id", user.id)
           .maybeSingle();
 
         if (verifyError) {
           console.error("Verify error:", verifyError);
+        } else {
+          console.log("✅ Subscription activated! Status:", verify?.subscription_status);
         }
 
-        console.log("Verified subscription status:", verified?.subscription_status);
-
-        // 3. Force redirect to Home with a slight delay
+        // ✅ 5. Redirect to Home (unlocked)
         setTimeout(() => {
           navigate("/home", { replace: true });
-        }, 500);
+        }, 800);
 
       } catch (error) {
         console.error("Activation error:", error);
-        setError("Something went wrong. Please try again.");
+        navigate("/");
       }
     };
 
     activateSubscription();
   }, [navigate, paymentId]);
-
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F7F8FC] p-4">
-        <div className="bg-white rounded-2xl shadow-sm p-8 max-w-md w-full text-center">
-          <div className="text-4xl mb-4">⚠️</div>
-          <h2 className="text-xl font-bold text-red-600 mb-2">Something went wrong</h2>
-          <p className="text-slate-600 mb-4">{error}</p>
-          <button
-            onClick={() => window.location.href = "/"}
-            className="bg-indigo-600 text-white px-6 py-2 rounded-xl font-semibold hover:bg-indigo-700"
-          >
-            Go Home
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#F7F8FC]">
