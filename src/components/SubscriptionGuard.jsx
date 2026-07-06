@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import SubscriptionModal from "./SubscriptionModal";
 import { getCurrentUser } from "@/lib/auth";
-import { getUserProgress } from "@/api/entities";
+import { supabase } from "@/api/supabaseClient";
 
 export default function SubscriptionGuard({ children }) {
   const [status, setStatus] = useState("loading");
@@ -10,26 +10,42 @@ export default function SubscriptionGuard({ children }) {
   useEffect(() => { checkSubscription(); }, []);
 
   const checkSubscription = async () => {
-    const currentUser = await getCurrentUser();
-    if (!currentUser) {
-      setStatus("locked");
-      return;
-    }
-    setUser(currentUser);
+    try {
+      const currentUser = await getCurrentUser();
+      if (!currentUser) {
+        setStatus("locked");
+        return;
+      }
+      setUser(currentUser);
 
-    if (currentUser.role === "admin") {
-      setStatus("active");
-      return;
-    }
+      if (currentUser.role === "admin") {
+        setStatus("active");
+        return;
+      }
 
-    const prog = await getUserProgress(currentUser.email);
+      // ✅ FIX: Use user_id instead of email
+      const { data: prog, error } = await supabase
+        .from("user_progress")
+        .select("*")
+        .eq("user_id", currentUser.id)
+        .maybeSingle();
 
-    if (prog?.subscription_status === "active" && prog.subscription_expires) {
-      const expired = new Date(prog.subscription_expires) < new Date();
-      setStatus(expired ? "expired" : "active");
-    } else if (prog?.subscription_status === "expired") {
-      setStatus("expired");
-    } else {
+      if (error) {
+        console.error("Error fetching progress:", error);
+        setStatus("locked");
+        return;
+      }
+
+      if (prog?.subscription_status === "active" && prog.subscription_expires) {
+        const expired = new Date(prog.subscription_expires) < new Date();
+        setStatus(expired ? "expired" : "active");
+      } else if (prog?.subscription_status === "expired") {
+        setStatus("expired");
+      } else {
+        setStatus("locked");
+      }
+    } catch (error) {
+      console.error("Subscription check error:", error);
       setStatus("locked");
     }
   };

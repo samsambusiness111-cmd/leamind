@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/api/supabaseClient";
 import { getCurrentUser } from "@/lib/auth";
@@ -7,28 +7,23 @@ export default function SuccessLeamind() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const paymentId = searchParams.get("razorpay_payment_id");
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const activateSubscription = async () => {
       try {
-        // 1. Get the current user
         const user = await getCurrentUser();
         if (!user) {
-          console.error("No user found");
           navigate("/");
           return;
         }
 
-        // 2. Check if payment ID exists
         if (!paymentId) {
-          console.error("No payment ID found");
           navigate("/");
           return;
         }
 
-        console.log("Activating subscription for user:", user.id, "Payment ID:", paymentId);
-
-        // 3. Check if user already has a progress record
+        // 1. Check if user already has a progress record
         let { data: existing, error: fetchError } = await supabase
           .from("user_progress")
           .select("*")
@@ -37,16 +32,16 @@ export default function SuccessLeamind() {
 
         if (fetchError && fetchError.code !== "PGRST116") {
           console.error("Fetch error:", fetchError);
-          navigate("/");
+          setError("Failed to load your account. Please contact support.");
           return;
         }
 
         const expires = new Date(Date.now() + 28 * 24 * 60 * 60 * 1000).toISOString();
 
-        // 4. If row exists, update it
+        let result;
         if (existing) {
-          console.log("Updating existing progress record:", existing.id);
-          const { error: updateError } = await supabase
+          // Update existing record
+          const { data, error } = await supabase
             .from("user_progress")
             .update({
               subscription_status: "active",
@@ -54,17 +49,19 @@ export default function SuccessLeamind() {
               last_payment_id: paymentId,
               enrolled: true,
             })
-            .eq("id", existing.id);
+            .eq("id", existing.id)
+            .select()
+            .single();
 
-          if (updateError) {
-            console.error("Update error:", updateError);
-            navigate("/");
+          if (error) {
+            console.error("Update error:", error);
+            setError("Failed to activate your subscription. Please contact support.");
             return;
           }
+          result = data;
         } else {
-          // 5. If no row exists, CREATE ONE
-          console.log("Creating NEW progress record for user:", user.id);
-          const { data: newRecord, error: insertError } = await supabase
+          // Create new record
+          const { data, error } = await supabase
             .from("user_progress")
             .insert({
               user_id: user.id,
@@ -81,25 +78,58 @@ export default function SuccessLeamind() {
             .select()
             .single();
 
-          if (insertError) {
-            console.error("Insert error:", insertError);
-            navigate("/");
+          if (error) {
+            console.error("Insert error:", error);
+            setError("Failed to activate your subscription. Please contact support.");
             return;
           }
-          console.log("New record created:", newRecord);
+          result = data;
         }
 
-        // 6. Success! Redirect to course
-        console.log("Subscription activated! Redirecting to Course...");
-        navigate("/Course");
+        // 2. VERIFY the update was successful
+        const { data: verified, error: verifyError } = await supabase
+          .from("user_progress")
+          .select("*")
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        if (verifyError) {
+          console.error("Verify error:", verifyError);
+        }
+
+        console.log("Verified subscription status:", verified?.subscription_status);
+
+        // 3. Force redirect to Home with a slight delay
+        setTimeout(() => {
+          navigate("/home", { replace: true });
+        }, 500);
+
       } catch (error) {
         console.error("Activation error:", error);
-        navigate("/");
+        setError("Something went wrong. Please try again.");
       }
     };
 
     activateSubscription();
   }, [navigate, paymentId]);
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#F7F8FC] p-4">
+        <div className="bg-white rounded-2xl shadow-sm p-8 max-w-md w-full text-center">
+          <div className="text-4xl mb-4">⚠️</div>
+          <h2 className="text-xl font-bold text-red-600 mb-2">Something went wrong</h2>
+          <p className="text-slate-600 mb-4">{error}</p>
+          <button
+            onClick={() => window.location.href = "/"}
+            className="bg-indigo-600 text-white px-6 py-2 rounded-xl font-semibold hover:bg-indigo-700"
+          >
+            Go Home
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#F7F8FC]">

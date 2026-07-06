@@ -1,11 +1,11 @@
 import supabase from '@/api/supabaseClient';
 
-export async function getUserProgress(email) {
-  if (!email) return null;
+export async function getUserProgress(userId) {
+  if (!userId) return null;
   const { data, error } = await supabase
     .from('user_progress')
     .select('*')
-    .eq('created_by', email)
+    .eq('user_id', userId)
     .maybeSingle();
   if (error) throw error;
   return data;
@@ -38,19 +38,19 @@ export async function updateUserProgress(id, updates) {
   return data;
 }
 
-export async function deleteUserProgress(email) {
+export async function deleteUserProgress(userId) {
   const { error } = await supabase
     .from('user_progress')
     .delete()
-    .eq('created_by', email);
+    .eq('user_id', userId);
   if (error) throw error;
 }
 
-export async function isPaymentIdUsedByOther(paymentId, email) {
+export async function isPaymentIdUsedByOther(paymentId, userId) {
   if (!paymentId) return false;
   const { data, error } = await supabase.rpc('check_payment_id_used', {
     p_id: paymentId,
-    user_email: email,
+    p_user_id: userId,
   });
   if (error) throw error;
   return !!data;
