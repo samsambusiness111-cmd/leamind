@@ -5,7 +5,7 @@ import ProgressBar from "@/components/course/ProgressBar";
 import CertificateDownload from "@/components/course/CertificateDownload";
 import { createPageUrl } from "@/utils";
 import { getCurrentUser } from "@/lib/auth";
-import { getUserProgress } from "@/api/entities";
+import { supabase } from "@/api/supabaseClient";
 import { LOGO_URL } from "@/lib/constants";
 import { Award, ArrowRight, RotateCcw, CheckCircle2, Download, Home } from "lucide-react";
 
@@ -27,7 +27,12 @@ export default function Summary() {
   const loadProgress = async () => {
     const currentUser = await getCurrentUser();
     if (!currentUser) { navigate("/"); return; }
-    const userRecord = await getUserProgress(currentUser.email);
+    // ✅ FIX: Use user.id instead of email
+    const { data: userRecord, error } = await supabase
+      .from("user_progress")
+      .select("*")
+      .eq("user_id", currentUser.id)
+      .maybeSingle();
     if (userRecord) setProgress(userRecord);
     const active = userRecord?.subscription_status === "active" && userRecord?.subscription_expires && new Date(userRecord.subscription_expires) > new Date();
     setIsPremium(currentUser.role === "admin" || active);

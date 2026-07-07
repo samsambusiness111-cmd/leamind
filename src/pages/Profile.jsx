@@ -5,7 +5,7 @@ import CertificateDownload from "@/components/course/CertificateDownload";
 import ProgressBar from "@/components/course/ProgressBar";
 import { createPageUrl } from "@/utils";
 import { getCurrentUser, signOut } from "@/lib/auth";
-import { getUserProgress, updateUserProgress, deleteUserProgress } from "@/api/entities";
+import { supabase } from "@/api/supabaseClient";
 import { LOGO_URL } from "@/lib/constants";
 import { Award, Flame, CheckCircle2, Save, ChevronRight, LogOut, BookOpen, Trophy, Shield, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -18,7 +18,6 @@ function daysRemaining(subscriptionExpires) {
   const now = new Date();
   const diffMs = expiry - now;
   if (diffMs <= 0) return 0;
-  // Day 1 = 28/28, Day 2 = 27/28, etc.
   return Math.min(28, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
 }
 
@@ -53,7 +52,13 @@ export default function Profile() {
   const handleDeleteAccount = async () => {
     setDeleting(true);
     try {
-      if (user?.email) await deleteUserProgress(user.email);
+      // ✅ FIX: Delete by user_id instead of email
+      if (user?.id) {
+        await supabase
+          .from("user_progress")
+          .delete()
+          .eq("user_id", user.id);
+      }
       await signOut();
     } catch (err) {
       console.error(err);
@@ -68,7 +73,12 @@ export default function Profile() {
       setLoading(false);
       return;
     }
-    const userRecord = await getUserProgress(u.email);
+    // ✅ FIX: Use user.id instead of email
+    const { data: userRecord, error } = await supabase
+      .from("user_progress")
+      .select("*")
+      .eq("user_id", u.id)
+      .maybeSingle();
     if (userRecord) {
       setProgress(userRecord);
       setDisplayName(userRecord.display_name || u.full_name || "");
@@ -81,10 +91,17 @@ export default function Profile() {
     const trimmed = displayName.trim();
     setSaving(true);
     try {
-      const updated = await updateUserProgress(progress.id, { display_name: trimmed });
-      setProgress(updated);
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
+      const { data: updated, error } = await supabase
+        .from("user_progress")
+        .update({ display_name: trimmed })
+        .eq("id", progress.id)
+        .select()
+        .single();
+      if (!error && updated) {
+        setProgress(updated);
+        setSaved(true);
+        setTimeout(() => setSaved(false), 2000);
+      }
     } finally {
       setSaving(false);
     }
