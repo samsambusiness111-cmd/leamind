@@ -8,7 +8,7 @@ import ProgressBar from "@/components/course/ProgressBar";
 import CertificateDownload from "@/components/course/CertificateDownload";
 import { createPageUrl } from "@/utils";
 import { getCurrentUser } from "@/lib/auth";
-import { listUserProgress, createUserProgress, updateUserProgress } from "@/api/entities";
+import { supabase } from "@/api/supabaseClient";
 import { Menu, X } from "lucide-react";
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
@@ -32,8 +32,19 @@ export default function Course() {
     const user = await getCurrentUser();
     if (!user) { navigate("/"); return; }
 
-    const records = await listUserProgress();
-    const userRecord = records.find(r => r.created_by === user.email);
+    // ✅ FIX: Use user_id instead of email
+    const { data: userRecord, error } = await supabase
+      .from("user_progress")
+      .select("*")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (error) {
+      console.error("Error loading progress:", error);
+      setLoading(false);
+      return;
+    }
+
     if (userRecord) {
       setProgress(userRecord);
       if (!urlParams.get("module") && userRecord.current_module) {
@@ -41,15 +52,24 @@ export default function Course() {
         setActiveLessonIndex(userRecord.current_lesson || 0);
       }
     } else {
-      const record = await createUserProgress({
-        created_by: user.email,
-        enrolled: true,
-        completed_lessons: [],
-        quiz_scores: {},
-        current_module: initModule,
-        current_lesson: 0,
-      });
-      setProgress(record);
+      // ✅ FIX: Use user_id instead of created_by
+      const { data: record, error: createError } = await supabase
+        .from("user_progress")
+        .insert({
+          user_id: user.id,
+          user_email: user.email,
+          enrolled: true,
+          completed_lessons: [],
+          quiz_scores: {},
+          current_module: initModule,
+          current_lesson: 0,
+        })
+        .select()
+        .single();
+
+      if (!createError && record) {
+        setProgress(record);
+      }
     }
     setLoading(false);
   };
@@ -66,8 +86,15 @@ export default function Course() {
 
   const saveProgress = async (updates) => {
     if (!progress?.id) return;
-    const updated = await updateUserProgress(progress.id, updates);
-    setProgress(updated);
+    const { data: updated, error } = await supabase
+      .from("user_progress")
+      .update(updates)
+      .eq("id", progress.id)
+      .select()
+      .single();
+    if (!error && updated) {
+      setProgress(updated);
+    }
   };
 
   const handleLessonComplete = async (lessonId) => {

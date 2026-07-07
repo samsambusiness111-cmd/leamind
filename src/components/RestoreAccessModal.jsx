@@ -2,12 +2,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, AlertCircle, Loader2, Key } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
-import {
-  getUserProgress,
-  createUserProgress,
-  updateUserProgress,
-  isPaymentIdUsedByOther,
-} from "@/api/entities";
+import { supabase } from "@/api/supabaseClient";
 
 export default function RestoreAccessModal({ open, onClose, onSuccess }) {
   const [paymentId, setPaymentId] = useState("");
@@ -22,46 +17,86 @@ export default function RestoreAccessModal({ open, onClose, onSuccess }) {
 
     setStatus("loading");
     const user = await getCurrentUser();
-    if (!user) { setStatus("error"); setErrorMsg("You must be logged in."); return; }
+    if (!user) { 
+      setStatus("error"); 
+      setErrorMsg("You must be logged in."); 
+      return; 
+    }
 
-    const usedByOther = await isPaymentIdUsedByOther(pid, user.email);
-    if (usedByOther) {
+    // Check if payment already used by another user
+    const { data: existingCheck, error: checkError } = await supabase
+      .from("user_progress")
+      .select("id, last_payment_id, user_id")
+      .eq("last_payment_id", pid)
+      .maybeSingle();
+
+    if (checkError) {
+      setStatus("error");
+      setErrorMsg("Error checking payment ID.");
+      return;
+    }
+
+    if (existingCheck && existingCheck.user_id !== user.id) {
       setStatus("already_used");
       return;
     }
 
-    const prog = await getUserProgress(user.email);
+    // Check if user already has a record
+    const { data: prog, error: fetchError } = await supabase
+      .from("user_progress")
+      .select("*")
+      .eq("user_id", user.id)
+      .maybeSingle();
 
+    if (fetchError) {
+      setStatus("error");
+      setErrorMsg("Error fetching user record.");
+      return;
+    }
+
+    // If already active with same ID
     if (prog?.last_payment_id === pid && prog?.subscription_status === "active") {
       const stillActive = prog.subscription_expires && new Date(prog.subscription_expires) > new Date();
-      if (stillActive) { setStatus("success"); onSuccess?.(); return; }
+      if (stillActive) { 
+        setStatus("success"); 
+        onSuccess?.(); 
+        return; 
+      }
     }
 
     const expires = new Date(Date.now() + 28 * 24 * 60 * 60 * 1000).toISOString();
     const today = new Date().toISOString().slice(0, 10);
 
     if (prog) {
-      await updateUserProgress(prog.id, {
-        subscription_status: "active",
-        subscription_expires: expires,
-        enrolled: true,
-        last_payment_id: pid,
-      });
+      // ✅ FIX: Use user_id instead of created_by
+      await supabase
+        .from("user_progress")
+        .update({
+          subscription_status: "active",
+          subscription_expires: expires,
+          enrolled: true,
+          last_payment_id: pid,
+        })
+        .eq("id", prog.id);
     } else {
-      await createUserProgress({
-        created_by: user.email,
-        enrolled: true,
-        completed_lessons: [],
-        quiz_scores: {},
-        current_module: "deepseek",
-        current_lesson: 0,
-        subscription_status: "active",
-        subscription_expires: expires,
-        last_payment_id: pid,
-        streak_count: 1,
-        longest_streak: 1,
-        last_login_date: today,
-      });
+      // ✅ FIX: Use user_id instead of created_by
+      await supabase
+        .from("user_progress")
+        .insert({
+          user_id: user.id,
+          user_email: user.email,
+          enrolled: true,
+          completed_lessons: [],
+          quiz_scores: {},
+          current_module: "deepseek",
+          current_lesson: 0,
+          subscription_status: "active",
+          subscription_expires: expires,
+          last_payment_id: pid,
+          streak_count: 1,
+          longest_streak: 1,
+          last_login_date: today,
+        });
     }
 
     setStatus("success");
