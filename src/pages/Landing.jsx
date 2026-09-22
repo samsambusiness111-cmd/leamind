@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import { CheckCircle2, Star, Zap, Lock, Rocket, Quote, Shield, Award, TrendingUp } from "lucide-react";
+import { CheckCircle2, Star, Zap, Lock, Rocket, Quote, Shield, Award, TrendingUp, Brain, Target, Users, BookOpen } from "lucide-react";
 import FreeLessonSection from "@/components/landing/FreeLessonSection";
 import { openRazorpayCheckout } from "@/utils/razorpay";
 import { getCurrentUser, redirectToLogin } from "@/lib/auth";
 import { LOGO_URL } from "@/lib/constants";
-
 
 const TOOLS = [
   { emoji: "🤖", name: "ChatGPT", level: "Beginner", color: "from-green-500 to-emerald-600" },
@@ -27,83 +26,10 @@ const LEVEL_COLORS = {
   "All Levels": "bg-indigo-500/15 text-indigo-400 border border-indigo-500/30",
 };
 
-const REVIEWS = [
-  { name: "Rahul Verma", role: "Software Developer", company: "Delhi", text: "Honestly saves me 2–3 hours every day. The lessons are short, practical, and actually show you what to type. Worth every rupee.", initials: "RV", highlight: "Saves 2–3 hrs daily", avatarGrad: "from-blue-500 to-indigo-600", module: "GitHub Copilot + ChatGPT", date: "March 2026" },
-  { name: "Sneha Iyer", role: "College Student", company: "Pune", text: "₹500 for an AI course? It literally costs less than a coffee + samosa combo. The Notion AI and Perplexity modules alone changed how I study.", initials: "SI", highlight: "Less than a coffee ☕", avatarGrad: "from-pink-500 to-rose-500", module: "Notion AI + Perplexity", date: "February 2026" },
-  { name: "Aditya Sharma", role: "Marketing Executive", company: "Mumbai", text: "I'm consistently getting small content gigs on the side using AI. Realistic, learnable skills that actually opened a side income stream.", initials: "AS", highlight: "Side income gigs", avatarGrad: "from-amber-500 to-orange-500", module: "ChatGPT + Claude", date: "January 2026" },
-  { name: "Priya Menon", role: "Freelance Designer", company: "Bangalore", text: "The Midjourney module helped me offer AI-generated mockups to clients. My existing work became faster and more impressive.", initials: "PM", highlight: "More value per project", avatarGrad: "from-purple-500 to-violet-600", module: "Midjourney / DALL-E", date: "March 2026" },
-  { name: "Karan Malhotra", role: "HR Manager", company: "Hyderabad", text: "After the ChatGPT module, I now draft job descriptions and performance reviews in minutes. If you work with documents all day, this is essential.", initials: "KM", highlight: "10x faster drafting", avatarGrad: "from-teal-500 to-green-500", module: "ChatGPT", date: "April 2026" },
-];
-
-const BOTTOM_REVIEWS = REVIEWS;
-
 const CERT_SAMPLES = [
-  { name: "Rahul Verma", module: "ChatGPT", id: "LM-K9X2-R4TW-5AJP", date: "March 2026" },
-  { name: "Priya Menon", module: "Midjourney", id: "LM-T7YZ-Q2NW-8BKP", date: "March 2026" },
+  { name: "Sample Certificate", module: "ChatGPT", id: "SAMPLE-0001", date: "2026" },
+  { name: "Sample Certificate", module: "Midjourney", id: "SAMPLE-0002", date: "2026" },
 ];
-
-const GHOST_ENROLLMENTS = [
-  { city: "Mumbai" },
-  { city: "Bangalore" },
-  { city: "Delhi" },
-  { city: "Pune" },
-  { city: "Hyderabad" },
-  { city: "Chennai" },
-  { city: "Jaipur" },
-  { city: "Kochi" },
-  { city: "Ahmedabad" },
-  { city: "Kolkata" },
-  { city: "Lucknow" },
-  { city: "Surat" },
-  { city: "Bhopal" },
-  { city: "Nagpur" },
-  { city: "Coimbatore" },
-  { city: "Chandigarh" },
-  { city: "Indore" },
-  { city: "Vadodara" },
-  { city: "Patna" },
-  { city: "Visakhapatnam" },
-];
-
-/* ─── Ghost Activity Toast ─── */
-function GhostToast() {
-  const [visible, setVisible] = useState(false);
-  const [current, setCurrent] = useState(0);
-
-  useEffect(() => {
-    const initial = setTimeout(() => {
-      setVisible(true);
-      setTimeout(() => setVisible(false), 4500);
-    }, 4000);
-
-    const interval = setInterval(() => {
-      setCurrent(prev => (prev + 1) % GHOST_ENROLLMENTS.length);
-      setVisible(true);
-      setTimeout(() => setVisible(false), 4500);
-    }, 15000);
-
-    return () => { clearTimeout(initial); clearInterval(interval); };
-  }, []);
-
-  const entry = GHOST_ENROLLMENTS[current];
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: -60, y: 0 }}
-      animate={visible ? { opacity: 1, x: 0 } : { opacity: 0, x: -60 }}
-      transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-      className="fixed bottom-32 sm:bottom-24 left-3 sm:left-4 z-[60] max-w-[260px] pointer-events-none"
-    >
-      <div className="flex items-center gap-3 bg-[#111] border border-white/10 rounded-2xl px-4 py-3 shadow-[0_8px_30px_rgba(0,0,0,0.6)]">
-        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-base shrink-0">🚀</div>
-        <div>
-          <p className="text-white text-sm font-bold leading-tight">Someone from {entry.city}</p>
-          <p className="text-white/40 text-xs mt-0.5">just enrolled in <span className="text-emerald-400">the AI Masterclass</span></p>
-        </div>
-      </div>
-    </motion.div>
-  );
-}
 
 /* ─── Fade-in wrapper ─── */
 function FadeIn({ children, delay = 0, className = "" }) {
@@ -120,34 +46,6 @@ function FadeIn({ children, delay = 0, className = "" }) {
       {children}
     </motion.div>
   );
-}
-
-/* ─── Countdown ─── */
-function useCountdown(seconds) {
-  const [timeLeft, setTimeLeft] = useState(seconds);
-  useEffect(() => {
-    if (timeLeft <= 0) return;
-    const t = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
-    return () => clearTimeout(t);
-  }, [timeLeft]);
-  const m = String(Math.floor(timeLeft / 60)).padStart(2, "0");
-  const s = String(timeLeft % 60).padStart(2, "0");
-  return { m, s, timeLeft };
-}
-
-/* ─── Dynamic spot counter ─── */
-function useSpotCounter(start = 247) {
-  const [spots, setSpots] = useState(start);
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setSpots(prev => {
-        if (prev <= 9) return prev;
-        return Math.random() < 0.3 ? prev - 1 : prev;
-      });
-    }, 18000);
-    return () => clearInterval(interval);
-  }, []);
-  return spots;
 }
 
 /* ─── Section label ─── */
@@ -222,27 +120,15 @@ function CertMiniPreview({ cert }) {
   );
 }
 
-/* ─── Review Card ─── */
-function ReviewCard({ r }) {
+/* ─── Feature Card (replaces fake reviews) ─── */
+function FeatureCard({ icon: Icon, title, text, color }) {
   return (
-    <div className="relative bg-white/[0.04] border border-white/10 rounded-2xl p-4 overflow-hidden hover:border-white/14 transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,255,255,0.03)]">
-      <Quote className="absolute top-3 right-3 w-5 h-5 text-white/5" />
-      <div className="flex items-start gap-3 mb-3">
-        <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${r.avatarGrad} flex items-center justify-center text-white font-black text-sm shrink-0`}>{r.initials}</div>
-        <div className="flex-1 min-w-0">
-          <p className="font-bold text-white text-sm leading-tight">{r.name}</p>
-          <p className="text-white/40 text-sm mt-0.5">{r.role} · {r.company}</p>
-          <div className="flex items-center gap-1 mt-1.5">
-            {[...Array(5)].map((_, i) => <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />)}
-            <span className="text-xs text-white/20 ml-1">{r.date}</span>
-          </div>
-        </div>
+    <div className="relative bg-white/[0.04] border border-white/10 rounded-2xl p-5 overflow-hidden hover:border-white/14 transition-all duration-300">
+      <div className={`w-10 h-10 rounded-xl ${color} flex items-center justify-center mb-3`}>
+        <Icon className="w-5 h-5 text-white" />
       </div>
-      <p className="text-white/60 text-sm leading-relaxed mb-3 italic">"{r.text}"</p>
-      <div className="flex items-center justify-between gap-2 pt-3 border-t border-white/5">
-        <span className="text-xs text-indigo-300/80 bg-indigo-500/10 px-2.5 py-1 rounded-full">{r.module}</span>
-        <span className="text-xs font-bold text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-full">{r.highlight}</span>
-      </div>
+      <p className="font-bold text-white text-base mb-1.5">{title}</p>
+      <p className="text-white/50 text-sm leading-relaxed">{text}</p>
     </div>
   );
 }
@@ -250,7 +136,6 @@ function ReviewCard({ r }) {
 export default function Landing() {
   const [loading, setLoading] = useState(false);
   const [payLoading, setPayLoading] = useState(false);
-  const spots = useSpotCounter(247);
 
   const handleSignUp = async () => {
     setLoading(true);
@@ -286,8 +171,6 @@ export default function Landing() {
   return (
     <div className="min-h-[100dvh] w-full overflow-x-hidden font-sans" style={{ background: "#000000", color: "#ffffff" }}>
 
-      <GhostToast />
-
       {/* ── STICKY MOBILE CTA ── */}
       <div className="fixed bottom-0 left-0 right-0 z-50 sm:hidden px-3 pb-safe"
         style={{ background: "linear-gradient(to top, rgba(0,0,0,1) 80%, rgba(0,0,0,0.95) 90%, transparent)", paddingBottom: "max(env(safe-area-inset-bottom, 12px), 12px)", paddingTop: "12px" }}>
@@ -313,13 +196,12 @@ export default function Landing() {
           <div className="flex items-center gap-4">
             <span className="hidden sm:flex items-center gap-1.5 text-white/25 text-xs font-medium">
               <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
-              {spots} spots left
+              Early access open
             </span>
             <button onClick={handleSignUp} disabled={loading}
               className="bg-emerald-500 hover:bg-emerald-400 text-black text-sm font-black px-4 sm:px-5 py-2.5 rounded-full transition-colors shadow-[0_0_20px_rgba(52,211,153,0.25)] disabled:opacity-70">
               {loading ? "..." : "Sign Up →"}
             </button>
-
           </div>
         </div>
       </nav>
@@ -338,18 +220,21 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto relative px-4 sm:px-0">
           <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr_240px] gap-6 sm:gap-10 xl:gap-14 items-start">
 
+            {/* ── LEFT: Features (replaced reviews) ── */}
             <div className="hidden lg:flex flex-col gap-5 pt-16">
               <div className="flex items-center gap-2 mb-1">
                 <Star className="w-3 h-3 fill-yellow-500 text-yellow-500" />
-                <p className="text-yellow-600/60 font-bold text-[9px] uppercase tracking-[3px]">Student Reviews</p>
+                <p className="text-yellow-600/60 font-bold text-[9px] uppercase tracking-[3px]">Why Leamind</p>
               </div>
-              {REVIEWS.slice(0, 2).map((r, i) => (
-                <motion.div key={r.name} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 + i * 0.15, duration: 0.6 }}>
-                  <ReviewCard r={r} />
-                </motion.div>
-              ))}
+              <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4, duration: 0.6 }}>
+                <FeatureCard icon={Brain} title="Practical Skills" text="Learn by doing real exercises, not just watching videos." color="bg-gradient-to-br from-blue-500 to-indigo-600" />
+              </motion.div>
+              <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.55, duration: 0.6 }}>
+                <FeatureCard icon={Target} title="Beginner Friendly" text="Zero coding needed. Every lesson starts from scratch." color="bg-gradient-to-br from-pink-500 to-rose-500" />
+              </motion.div>
             </div>
 
+            {/* ── CENTER ── */}
             <div className="text-center">
 
               <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
@@ -457,7 +342,7 @@ export default function Landing() {
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   {CERT_SAMPLES.map((cert, i) => (
-                    <div key={i}><CertMiniPreview cert={cert} /><p className="text-white/25 text-xs mt-1.5 text-center">{cert.name} · {cert.module}</p></div>
+                    <div key={i}><CertMiniPreview cert={cert} /><p className="text-white/25 text-xs mt-1.5 text-center">{cert.module}</p></div>
                   ))}
                 </div>
               </div>
@@ -511,20 +396,22 @@ export default function Landing() {
               </FadeIn>
 
               <div className="lg:hidden mt-8 text-left space-y-3">
-                <SectionLabel>Real Results From Students</SectionLabel>
-                {REVIEWS.slice(0, 3).map(r => <ReviewCard key={r.name} r={r} />)}
+                <SectionLabel>Why Leamind</SectionLabel>
+                <FeatureCard icon={Brain} title="Practical Skills" text="Learn by doing real exercises, not just watching videos." color="bg-gradient-to-br from-blue-500 to-indigo-600" />
+                <FeatureCard icon={Target} title="Beginner Friendly" text="Zero coding needed. Every lesson starts from scratch." color="bg-gradient-to-br from-pink-500 to-rose-500" />
               </div>
             </div>
 
+            {/* ── RIGHT: 2 Certificates ── */}
             <div className="hidden lg:flex flex-col gap-5 pt-16">
               <div className="flex items-center gap-2 mb-1">
                 <Award className="w-3 h-3 text-yellow-500" />
                 <p className="text-yellow-600/60 font-bold text-[9px] uppercase tracking-[3px]">Sample Certificates</p>
               </div>
               {CERT_SAMPLES.map((cert, i) => (
-                <motion.div key={cert.name} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 + i * 0.15, duration: 0.6 }}>
+                <motion.div key={cert.module} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 + i * 0.15, duration: 0.6 }}>
                   <CertMiniPreview cert={cert} />
-                  <p className="text-white/18 text-[9px] mt-1.5 text-center tracking-wide">{cert.name} · {cert.module}</p>
+                  <p className="text-white/18 text-[9px] mt-1.5 text-center tracking-wide">{cert.module}</p>
                 </motion.div>
               ))}
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.75 }}
@@ -540,16 +427,17 @@ export default function Landing() {
 
       <FreeLessonSection onSignUp={handleSignUp} />
 
+      {/* STATS */}
       <FadeIn>
         <section className="py-12 sm:py-20 px-4 border-t border-white/5" style={{ background: "#000000" }}>
           <div className="max-w-4xl mx-auto text-center">
-            <SectionLabel>Results</SectionLabel>
+            <SectionLabel>What's Inside</SectionLabel>
 
-            <h2 className="text-2xl sm:text-4xl font-black text-white mb-8 sm:mb-12 tracking-tight">What Our Students Achieve</h2>
+            <h2 className="text-2xl sm:text-4xl font-black text-white mb-8 sm:mb-12 tracking-tight">Everything You Get</h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
               {[
-                { icon: "🧠", value: "10+", label: "AI tools taught in depth", sub: "With interactive exercises" },
-                { icon: "📈", value: "70+", label: "Hands-on lessons", sub: "Structured, practical, clear" },
+                { icon: "🧠", value: "10", label: "AI tools taught in depth", sub: "With interactive exercises" },
+                { icon: "📚", value: "70+", label: "Hands-on lessons", sub: "Structured, practical, clear" },
                 { icon: "🎓", value: "10", label: "Verified certificates", sub: "Downloadable PDFs for your resume" },
               ].map((stat, i) => (
                 <motion.div key={stat.label}
@@ -569,6 +457,7 @@ export default function Landing() {
         </section>
       </FadeIn>
 
+      {/* TOOLS */}
       <FadeIn>
         <section className="py-12 sm:py-20 px-4 border-t border-white/5" style={{ background: "#050505" }}>
           <div className="max-w-5xl mx-auto">
@@ -596,6 +485,7 @@ export default function Landing() {
         </section>
       </FadeIn>
 
+      {/* HOW IT WORKS */}
       <FadeIn>
         <section className="py-12 sm:py-20 px-4 border-t border-white/5" style={{ background: "#000000" }}>
           <div className="max-w-4xl mx-auto text-center">
@@ -639,6 +529,7 @@ export default function Landing() {
         </section>
       </FadeIn>
 
+      {/* TRUST STRIP */}
       <FadeIn>
         <section className="py-8 sm:py-10 px-4 border-t border-b border-white/4" style={{ background: "#030303" }}>
           <div className="max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
@@ -658,6 +549,7 @@ export default function Landing() {
         </section>
       </FadeIn>
 
+      {/* BEFORE YOU DECIDE */}
       <FadeIn>
         <section className="py-12 sm:py-20 px-4 border-t border-white/5" style={{ background: "#040408" }}>
           <div className="max-w-3xl mx-auto">
@@ -719,34 +611,29 @@ export default function Landing() {
         </section>
       </FadeIn>
 
+      {/* WHY LEAMIND (replaced fake reviews) */}
       <FadeIn>
         <section className="py-12 sm:py-20 px-4 border-t border-white/5 relative overflow-hidden" style={{ background: "#050505" }}>
           <div className="absolute top-0 right-0 w-[500px] h-[500px] pointer-events-none"
             style={{ background: "radial-gradient(ellipse, rgba(99,102,241,0.06) 0%, transparent 65%)" }} />
           <div className="max-w-6xl mx-auto relative">
-            <SectionLabel>Student Stories</SectionLabel>
-            <h2 className="text-2xl sm:text-4xl font-black text-white text-center mb-2 tracking-tight">Real People. Real Results.</h2>
-            <p className="text-center text-white/40 text-base mb-8 sm:mb-14">Not motivational fluff. Actual outcomes from people like you.</p>
+            <SectionLabel>Why Leamind</SectionLabel>
+            <h2 className="text-2xl sm:text-4xl font-black text-white text-center mb-2 tracking-tight">Built Different. Built for You.</h2>
+            <p className="text-center text-white/40 text-base mb-8 sm:mb-14">No fluff. No fake promises. Just real skills at a real price.</p>
 
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-3 sm:gap-4 mb-3 sm:mb-4">
-              <div className="lg:col-span-2">
-                <ReviewCard r={BOTTOM_REVIEWS[0]} />
-              </div>
-              <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-                {BOTTOM_REVIEWS.slice(1, 4).map(r => (
-                  <ReviewCard key={r.name} r={r} />
-                ))}
-              </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <FeatureCard icon={BookOpen} title="70+ Hands-On Lessons" text="Not passive videos. Every lesson teaches a real skill you can use immediately." color="bg-gradient-to-br from-blue-500 to-indigo-600" />
+              <FeatureCard icon={Target} title="10 AI Tools Covered" text="ChatGPT, Claude, Midjourney, Perplexity, GitHub Copilot, and 5 more." color="bg-gradient-to-br from-purple-500 to-pink-600" />
+              <FeatureCard icon={Award} title="10 Verified Certificates" text="Download PDF certificates for your resume and LinkedIn." color="bg-gradient-to-br from-yellow-500 to-orange-600" />
+              <FeatureCard icon={Users} title="Built for Indian Students" text="Priced for India. Paid via UPI, GPay, PhonePe. No credit card needed." color="bg-gradient-to-br from-emerald-500 to-teal-600" />
+              <FeatureCard icon={Zap} title="Instant Access" text="Sign up and start learning in under 60 seconds. No waiting." color="bg-gradient-to-br from-rose-500 to-red-600" />
+              <FeatureCard icon={Shield} title="One-Time Payment" text="₹500 once. Lifetime access. No subscription. No auto-renewal." color="bg-gradient-to-br from-teal-500 to-cyan-600" />
             </div>
-
-            <div className="border border-white/8 rounded-2xl p-5 sm:p-6 hover:border-white/13 transition-colors" style={{ background: "rgba(255,255,255,0.03)" }}>
-              <ReviewCard r={BOTTOM_REVIEWS[4]} />
-            </div>
-            <p className="text-center text-white/20 text-xs mt-6 sm:mt-8 tracking-wide">Results may vary. Real student experiences shared with permission.</p>
           </div>
         </section>
       </FadeIn>
 
+      {/* FINAL CTA */}
       <FadeIn>
         <section className="py-16 sm:py-28 px-4 text-center relative overflow-hidden border-t border-white/5" style={{ background: "#000000" }}>
           <div className="absolute inset-0 pointer-events-none"
@@ -775,6 +662,7 @@ export default function Landing() {
         </section>
       </FadeIn>
 
+      {/* FOUNDER'S NOTE */}
       <FadeIn>
         <section className="py-10 sm:py-16 px-4 border-t border-white/5" style={{ background: "#040404" }}>
           <div className="max-w-2xl mx-auto">
