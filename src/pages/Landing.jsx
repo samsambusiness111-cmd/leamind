@@ -71,13 +71,11 @@ function GhostToast() {
   const [current, setCurrent] = useState(0);
 
   useEffect(() => {
-    // Show first toast after 4 seconds
     const initial = setTimeout(() => {
       setVisible(true);
       setTimeout(() => setVisible(false), 4500);
     }, 4000);
 
-    // Then cycle every 15 seconds
     const interval = setInterval(() => {
       setCurrent(prev => (prev + 1) % GHOST_ENROLLMENTS.length);
       setVisible(true);
@@ -168,8 +166,6 @@ function GoldDivider() {
   );
 }
 
-
-
 /* ─── CertMiniPreview ─── */
 function CertMiniPreview({ cert }) {
   const [hovered, setHovered] = useState(false);
@@ -180,7 +176,6 @@ function CertMiniPreview({ cert }) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* Hover overlay */}
       {hovered && (
         <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-2 rounded-xl"
           style={{ background: "rgba(0,0,0,0.85)", backdropFilter: "blur(4px)" }}>
@@ -252,8 +247,6 @@ function ReviewCard({ r }) {
   );
 }
 
-
-
 export default function Landing() {
   const [loading, setLoading] = useState(false);
   const [payLoading, setPayLoading] = useState(false);
@@ -293,7 +286,6 @@ export default function Landing() {
   return (
     <div className="min-h-[100dvh] w-full overflow-x-hidden font-sans" style={{ background: "#000000", color: "#ffffff" }}>
 
-      {/* ── GHOST ACTIVITY TOAST ── */}
       <GhostToast />
 
       {/* ── STICKY MOBILE CTA ── */}
@@ -332,8 +324,6 @@ export default function Landing() {
         </div>
       </nav>
 
-
-
       {/* ═══════════════════════════════════════
           HERO — 3 COLUMN
       ═══════════════════════════════════════ */}
@@ -348,7 +338,6 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto relative px-4 sm:px-0">
           <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr_240px] gap-6 sm:gap-10 xl:gap-14 items-start">
 
-            {/* ── LEFT: 2 Reviews ── */}
             <div className="hidden lg:flex flex-col gap-5 pt-16">
               <div className="flex items-center gap-2 mb-1">
                 <Star className="w-3 h-3 fill-yellow-500 text-yellow-500" />
@@ -361,17 +350,14 @@ export default function Landing() {
               ))}
             </div>
 
-            {/* ── CENTER ── */}
             <div className="text-center">
 
-              {/* Eyebrow pill */}
               <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
                 className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-4 py-2 mb-6 sm:mb-8">
                 <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-                <span className="text-emerald-300/80 text-sm font-semibold tracking-wide">🔥 500+ Students Already Mastering AI Tools</span>
+                <span className="text-emerald-300/80 text-sm font-semibold tracking-wide">🔥 Join early learners mastering AI tools</span>
               </motion.div>
 
-              {/* HEADLINE — Big & Bold */}
               <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -385,7 +371,6 @@ export default function Landing() {
                 </span>
               </motion.h1>
 
-              {/* Sub-headline */}
               <motion.p
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -396,7 +381,6 @@ export default function Landing() {
                 <span className="text-emerald-400 font-semibold">AI.</span>
               </motion.p>
 
-              {/* Hook statement — MOVED UP before price */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -410,7 +394,6 @@ export default function Landing() {
                 <p className="text-white/30 text-base mt-3">Be that person. Learn it properly. Start today — it's free to join.</p>
               </motion.div>
 
-              {/* Value bullets — what you GET */}
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -431,7 +414,6 @@ export default function Landing() {
                 ))}
               </motion.div>
 
-              {/* PRICE BLOCK */}
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.38, duration: 0.5 }}
                 className="mb-5 rounded-2xl border border-emerald-500/25 overflow-hidden"
                 style={{ background: "linear-gradient(135deg, rgba(52,211,153,0.06), rgba(0,0,0,0))" }}>
@@ -456,7 +438,6 @@ export default function Landing() {
                 </div>
               </motion.div>
 
-              {/* CTA */}
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.5 }}>
                 <button
                   onClick={handleSignUp}
@@ -469,9 +450,6 @@ export default function Landing() {
                 <p className="text-white/30 text-sm mt-3">✅ Free to browse · Pay ₹500 to unlock all courses</p>
               </motion.div>
 
-
-
-              {/* Mobile: certs */}
               <div className="lg:hidden mt-8 text-left">
                 <div className="flex items-center gap-2 mb-4">
                   <Award className="w-4 h-4 text-yellow-500" />
@@ -486,7 +464,6 @@ export default function Landing() {
 
               <GoldDivider />
 
-              {/* ── COMPARISON (Moved to hero area) ── */}
               <FadeIn>
                 <div className="border border-white/7 rounded-2xl sm:rounded-2xl overflow-hidden">
                   <div className="px-4 sm:px-6 pt-5 sm:pt-6 pb-4 text-center border-b border-white/5">
@@ -533,14 +510,12 @@ export default function Landing() {
                 </div>
               </FadeIn>
 
-              {/* Mobile: reviews */}
               <div className="lg:hidden mt-8 text-left space-y-3">
                 <SectionLabel>Real Results From Students</SectionLabel>
                 {REVIEWS.slice(0, 3).map(r => <ReviewCard key={r.name} r={r} />)}
               </div>
             </div>
 
-            {/* ── RIGHT: 2 Certificates ── */}
             <div className="hidden lg:flex flex-col gap-5 pt-16">
               <div className="flex items-center gap-2 mb-1">
                 <Award className="w-3 h-3 text-yellow-500" />
@@ -563,16 +538,8 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════
-          FREE LESSON — Try Before You Buy
-      ═══════════════════════════════════════ */}
       <FreeLessonSection onSignUp={handleSignUp} />
 
-
-
-      {/* ═══════════════════════════════════════
-          STATS
-      ═══════════════════════════════════════ */}
       <FadeIn>
         <section className="py-12 sm:py-20 px-4 border-t border-white/5" style={{ background: "#000000" }}>
           <div className="max-w-4xl mx-auto text-center">
@@ -582,8 +549,8 @@ export default function Landing() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
               {[
                 { icon: "🧠", value: "10+", label: "AI tools taught in depth", sub: "With interactive exercises" },
-                { icon: "📈", value: "500+", label: "Students enrolled", sub: "Growing every week" },
-                { icon: "🎓", value: "95%", label: "Report real skill improvement", sub: "Within first 2 weeks" },
+                { icon: "📈", value: "70+", label: "Hands-on lessons", sub: "Structured, practical, clear" },
+                { icon: "🎓", value: "10", label: "Verified certificates", sub: "Downloadable PDFs for your resume" },
               ].map((stat, i) => (
                 <motion.div key={stat.label}
                   initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.12, duration: 0.5 }}
@@ -602,9 +569,6 @@ export default function Landing() {
         </section>
       </FadeIn>
 
-      {/* ═══════════════════════════════════════
-          TOOLS / CERTIFICATES (replaces quiz)
-      ═══════════════════════════════════════ */}
       <FadeIn>
         <section className="py-12 sm:py-20 px-4 border-t border-white/5" style={{ background: "#050505" }}>
           <div className="max-w-5xl mx-auto">
@@ -632,9 +596,6 @@ export default function Landing() {
         </section>
       </FadeIn>
 
-      {/* ═══════════════════════════════════════
-          HOW IT WORKS — Zeigarnik Steps
-      ═══════════════════════════════════════ */}
       <FadeIn>
         <section className="py-12 sm:py-20 px-4 border-t border-white/5" style={{ background: "#000000" }}>
           <div className="max-w-4xl mx-auto text-center">
@@ -642,7 +603,6 @@ export default function Landing() {
             <h2 className="text-2xl sm:text-4xl font-black text-white mb-3 sm:mb-4 tracking-tight">Start in 3 Minutes. Results in 3 Days.</h2>
             <p className="text-white/40 text-base mb-8 sm:mb-14">Each lesson teaches you how a tool works, then gives you an exercise to use it yourself — so you actually learn it, not just watch it.</p>
 
-            {/* Progress bar visual */}
             <div className="max-w-2xl mx-auto mb-8 sm:mb-10">
               <div className="flex items-center gap-0 mb-3">
                 {["Sign Up", "Pick Tool", "Lesson", "Get Cert"].map((step, i) => (
@@ -679,16 +639,13 @@ export default function Landing() {
         </section>
       </FadeIn>
 
-      {/* ═══════════════════════════════════════
-          TRUST STRIP
-      ═══════════════════════════════════════ */}
       <FadeIn>
         <section className="py-8 sm:py-10 px-4 border-t border-b border-white/4" style={{ background: "#030303" }}>
           <div className="max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
             {[
               { icon: <Shield className="w-5 h-5 text-emerald-500" />, label: "Secure Payment", sub: "Razorpay · RBI compliant" },
               { icon: <Award className="w-5 h-5 text-yellow-500" />, label: "Verified Certs", sub: "Unique ID per cert" },
-              { icon: <TrendingUp className="w-5 h-5 text-indigo-400" />, label: "Results in Week 1", sub: "500+ students agree" },
+              { icon: <TrendingUp className="w-5 h-5 text-indigo-400" />, label: "Practical Learning", sub: "Real exercises, real skills" },
               { icon: <CheckCircle2 className="w-5 h-5 text-emerald-400" />, label: "No Auto-Renewal", sub: "One payment. Done." },
             ].map(t => (
               <div key={t.label} className="flex flex-col items-center text-center p-4 sm:p-5 rounded-2xl border border-white/6" style={{ background: "rgba(255,255,255,0.02)" }}>
@@ -701,11 +658,6 @@ export default function Landing() {
         </section>
       </FadeIn>
 
-
-
-      {/* ═══════════════════════════════════════
-          BEFORE YOU DECIDE
-      ═══════════════════════════════════════ */}
       <FadeIn>
         <section className="py-12 sm:py-20 px-4 border-t border-white/5" style={{ background: "#040408" }}>
           <div className="max-w-3xl mx-auto">
@@ -720,19 +672,19 @@ export default function Landing() {
                 {
                   concern: "\"₹500 sounds too cheap. Is this actually good quality?\"",
                   icon: "🤔",
-                  response: "We kept the price low on purpose — not because the content is low quality, but because we believe AI education shouldn't cost ₹20,000. Every lesson explains how a tool works, why it works, and gives you a real exercise to practice it yourself. 500+ students have gone through it. See the free lesson above and judge for yourself.",
+                  response: "We kept the price low on purpose — not because the content is low quality, but because we believe AI education shouldn't cost ₹20,000. Every lesson explains how a tool works, why it works, and gives you a real exercise to practice it yourself. See the free lesson above and judge for yourself.",
                   tag: "Quality"
                 },
                 {
                   concern: "\"What if I'm not tech-savvy? Will I be lost?\"",
                   icon: "😟",
-                  response: "All 10 modules start from zero. No coding. No technical background needed. Each lesson builds your understanding step by step, then gives you hands-on exercises to apply what you learned. Most of our students had never seriously used an AI tool before joining.",
+                  response: "All 10 modules start from zero. No coding. No technical background needed. Each lesson builds your understanding step by step, then gives you hands-on exercises to apply what you learned. Most learners had never seriously used an AI tool before joining.",
                   tag: "Beginner Friendly"
                 },
                 {
                   concern: "\"Is my payment safe? Will I get charged again later?\"",
                   icon: "🔒",
-                  response: "Payment is processed by Razorpay — India's most trusted payment gateway, used by Swiggy, Zepto, and thousands of businesses. This is a one-time payment. There is no subscription, no auto-renewal, and no hidden charges. You pay once, you get 30-day full access. That's it.",
+                  response: "Payment is processed by Razorpay — India's most trusted payment gateway, used by Swiggy, Zepto, and thousands of businesses. This is a one-time payment. There is no subscription, no auto-renewal, and no hidden charges. You pay once, you get 28-day full access. That's it.",
                   tag: "Payment Safety"
                 },
               ].map((item, i) => (
@@ -758,7 +710,6 @@ export default function Landing() {
               ))}
             </div>
 
-            {/* Bottom reassurance */}
             <div className="mt-6 sm:mt-8 border border-emerald-500/20 rounded-2xl p-5 sm:p-6 text-center"
               style={{ background: "rgba(52,211,153,0.04)" }}>
               <p className="text-emerald-400/90 text-base font-semibold mb-1">Still unsure? Read the free lesson above — it's the real thing.</p>
@@ -768,9 +719,6 @@ export default function Landing() {
         </section>
       </FadeIn>
 
-      {/* ═══════════════════════════════════════
-          5 REVIEWS
-      ═══════════════════════════════════════ */}
       <FadeIn>
         <section className="py-12 sm:py-20 px-4 border-t border-white/5 relative overflow-hidden" style={{ background: "#050505" }}>
           <div className="absolute top-0 right-0 w-[500px] h-[500px] pointer-events-none"
@@ -799,9 +747,6 @@ export default function Landing() {
         </section>
       </FadeIn>
 
-      {/* ═══════════════════════════════════════
-          FINAL CTA
-      ═══════════════════════════════════════ */}
       <FadeIn>
         <section className="py-16 sm:py-28 px-4 text-center relative overflow-hidden border-t border-white/5" style={{ background: "#000000" }}>
           <div className="absolute inset-0 pointer-events-none"
@@ -811,7 +756,7 @@ export default function Landing() {
             <h2 className="text-3xl sm:text-5xl md:text-6xl font-black text-white mb-4 tracking-tight leading-tight">
               Your AI Journey<br /><span className="text-emerald-400">Starts Today.</span>
             </h2>
-            <p className="text-white/40 text-base mb-6 sm:mb-8 font-medium max-w-sm mx-auto">No experience needed. Join 500+ students who are genuinely learning to master AI — not just dabble with it.</p>
+            <p className="text-white/40 text-base mb-6 sm:mb-8 font-medium max-w-sm mx-auto">No experience needed. Learn 10 AI tools the practical way — with hands-on exercises and certificates.</p>
             <div className="flex items-baseline justify-center gap-3 mb-5">
               <span className="text-white/25 text-2xl line-through font-bold">₹2,000</span>
               <span className="text-emerald-400 text-5xl font-black">₹500</span>
@@ -830,9 +775,6 @@ export default function Landing() {
         </section>
       </FadeIn>
 
-      {/* ═══════════════════════════════════════
-          FOUNDER'S NOTE
-      ═══════════════════════════════════════ */}
       <FadeIn>
         <section className="py-10 sm:py-16 px-4 border-t border-white/5" style={{ background: "#040404" }}>
           <div className="max-w-2xl mx-auto">
@@ -864,7 +806,6 @@ export default function Landing() {
         </section>
       </FadeIn>
 
-      {/* ── FOOTER ── */}
       <footer className="border-t border-white/4 py-8 pb-36 sm:pb-10 px-4 text-center" style={{ background: "#000000" }}>
         <div className="flex items-center justify-center gap-3 mb-4">
           <img src={LOGO_URL} alt="LeaMind" className="h-6 w-6 rounded-lg object-cover opacity-40" />
