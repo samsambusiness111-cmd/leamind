@@ -5,6 +5,7 @@ import FreeLessonSection from "@/components/landing/FreeLessonSection";
 import { openRazorpayCheckout } from "@/utils/razorpay";
 import { getCurrentUser, redirectToLogin } from "@/lib/auth";
 import { LOGO_URL } from "@/lib/constants";
+import EmailAuthModal from "@/components/EmailAuthModal";
 
 const TOOLS = [
   { emoji: "🤖", name: "ChatGPT", level: "Beginner", color: "from-green-500 to-emerald-600" },
@@ -31,7 +32,6 @@ const CERT_SAMPLES = [
   { name: "Sample Certificate", module: "Midjourney", id: "SAMPLE-0002", date: "2026" },
 ];
 
-/* ─── Fade-in wrapper ─── */
 function FadeIn({ children, delay = 0, className = "" }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-60px" });
@@ -48,12 +48,10 @@ function FadeIn({ children, delay = 0, className = "" }) {
   );
 }
 
-/* ─── Section label ─── */
 function SectionLabel({ children }) {
   return <p className="text-xs sm:text-[10px] font-bold tracking-[5px] text-yellow-600/70 uppercase mb-3 text-center">{children}</p>;
 }
 
-/* ─── Gold divider ─── */
 function GoldDivider() {
   return (
     <div className="flex items-center gap-3 my-6 sm:my-10">
@@ -64,7 +62,6 @@ function GoldDivider() {
   );
 }
 
-/* ─── CertMiniPreview ─── */
 function CertMiniPreview({ cert }) {
   const [hovered, setHovered] = useState(false);
   return (
@@ -120,7 +117,6 @@ function CertMiniPreview({ cert }) {
   );
 }
 
-/* ─── Feature Card (replaces fake reviews) ─── */
 function FeatureCard({ icon: Icon, title, text, color }) {
   return (
     <div className="relative bg-white/[0.04] border border-white/10 rounded-2xl p-5 overflow-hidden hover:border-white/14 transition-all duration-300">
@@ -136,18 +132,14 @@ function FeatureCard({ icon: Icon, title, text, color }) {
 export default function Landing() {
   const [loading, setLoading] = useState(false);
   const [payLoading, setPayLoading] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
 
   const handleSignUp = async () => {
-    setLoading(true);
-    try {
-      const user = await getCurrentUser();
-      if (user) {
-        window.location.href = "/home";
-      } else {
-        await redirectToLogin();
-      }
-    } finally {
-      setLoading(false);
+    const user = await getCurrentUser();
+    if (user) {
+      window.location.href = "/home";
+    } else {
+      setAuthModalOpen(true);
     }
   };
 
@@ -155,7 +147,7 @@ export default function Landing() {
     setPayLoading(true);
     const user = await getCurrentUser();
     if (!user) {
-      await redirectToLogin();
+      setAuthModalOpen(true);
       setPayLoading(false);
       return;
     }
@@ -206,9 +198,7 @@ export default function Landing() {
         </div>
       </nav>
 
-      {/* ═══════════════════════════════════════
-          HERO — 3 COLUMN
-      ═══════════════════════════════════════ */}
+      {/* HERO — 3 COLUMN */}
       <section className="px-0 sm:px-4 pt-10 sm:pt-20 pb-12 sm:pb-24 relative overflow-hidden" style={{ background: "#000000" }}>
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] pointer-events-none"
           style={{ background: "radial-gradient(ellipse, rgba(52,211,153,0.08) 0%, transparent 65%)" }} />
@@ -220,7 +210,6 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto relative px-4 sm:px-0">
           <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr_240px] gap-6 sm:gap-10 xl:gap-14 items-start">
 
-            {/* ── LEFT: Features (replaced reviews) ── */}
             <div className="hidden lg:flex flex-col gap-5 pt-16">
               <div className="flex items-center gap-2 mb-1">
                 <Star className="w-3 h-3 fill-yellow-500 text-yellow-500" />
@@ -234,7 +223,6 @@ export default function Landing() {
               </motion.div>
             </div>
 
-            {/* ── CENTER ── */}
             <div className="text-center">
 
               <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
@@ -402,7 +390,6 @@ export default function Landing() {
               </div>
             </div>
 
-            {/* ── RIGHT: 2 Certificates ── */}
             <div className="hidden lg:flex flex-col gap-5 pt-16">
               <div className="flex items-center gap-2 mb-1">
                 <Award className="w-3 h-3 text-yellow-500" />
@@ -611,7 +598,7 @@ export default function Landing() {
         </section>
       </FadeIn>
 
-      {/* WHY LEAMIND (replaced fake reviews) */}
+      {/* WHY LEAMIND */}
       <FadeIn>
         <section className="py-12 sm:py-20 px-4 border-t border-white/5 relative overflow-hidden" style={{ background: "#050505" }}>
           <div className="absolute top-0 right-0 w-[500px] h-[500px] pointer-events-none"
@@ -706,6 +693,11 @@ export default function Landing() {
         </div>
         <p className="text-white/15 text-sm">© {new Date().getFullYear()} LeaMind Academy. All rights reserved.</p>
       </footer>
+
+      <EmailAuthModal
+        open={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+      />
 
     </div>
   );

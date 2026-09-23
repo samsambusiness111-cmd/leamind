@@ -20,6 +20,7 @@ export async function getCurrentUser() {
   return mapUser(user);
 }
 
+// ── Google Sign-In (kept) ──
 export async function redirectToLogin() {
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
@@ -28,6 +29,31 @@ export async function redirectToLogin() {
     },
   });
   if (error) throw error;
+}
+
+// ── NEW: Email/Password Sign In ──
+export async function signInWithEmail(email, password) {
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+  if (error) throw error;
+  return mapUser(data.user);
+}
+
+// ── NEW: Email/Password Sign Up ──
+export async function signUpWithEmail(email, password, fullName = '') {
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        full_name: fullName,
+      },
+    },
+  });
+  if (error) throw error;
+  return mapUser(data.user);
 }
 
 export async function signOut() {
