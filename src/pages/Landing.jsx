@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { CheckCircle2, Star, Zap, Lock, Rocket, Quote, Shield, Award, TrendingUp, Brain, Target, Users, BookOpen } from "lucide-react";
 import FreeLessonSection from "@/components/landing/FreeLessonSection";
