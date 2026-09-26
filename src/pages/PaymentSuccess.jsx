@@ -25,29 +25,63 @@ export default function PaymentSuccess() {
       return;
     }
 
-    // Check if payment already used
-    const { data: existing, error: checkError } = await supabase
+    const expires = new Date(Date.now() + 28 * 24 * 60 * 60 * 1000).toISOString();
+    const today = new Date().toISOString().slice(0, 10);
+
+    // ── 1. WRITE TO SUBSCRIPTIONS TABLE (this is what the app checks now) ──
+    const { data: existingSub, error: subCheckError } = await supabase
+      .from("subscriptions")
+      .select("id, razorpay_payment_id")
+      .eq("user_email", user.email)
+      .maybeSingle();
+
+    if (subCheckError) {
+      console.error("Subscription check error:", subCheckError);
+    }
+
+    // Skip if same payment already applied
+    if (existingSub?.razorpay_payment_id === paymentId) {
+      navigate("/Course");
+      return;
+    }
+
+    if (existingSub) {
+      await supabase
+        .from("subscriptions")
+        .update({
+          status: "active",
+          start_date: new Date().toISOString(),
+          expiry_date: expires,
+          razorpay_payment_id: paymentId,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", existingSub.id);
+    } else {
+      await supabase
+        .from("subscriptions")
+        .insert({
+          user_id: user.id,
+          user_email: user.email,
+          status: "active",
+          start_date: new Date().toISOString(),
+          expiry_date: expires,
+          razorpay_payment_id: paymentId,
+        });
+    }
+
+    // ── 2. ALSO UPDATE user_progress (for backwards compatibility) ──
+    const { data: existingProgress } = await supabase
       .from("user_progress")
       .select("id, last_payment_id")
       .eq("user_id", user.id)
       .maybeSingle();
 
-    if (checkError) {
-      console.error("Check error:", checkError);
-      navigate("/");
-      return;
-    }
-
-    if (existing?.last_payment_id === paymentId) {
+    if (existingProgress?.last_payment_id === paymentId) {
       navigate("/Course");
       return;
     }
 
-    const expires = new Date(Date.now() + 28 * 24 * 60 * 60 * 1000).toISOString();
-    const today = new Date().toISOString().slice(0, 10);
-
-    if (existing) {
-      // ✅ FIX: Use user_id instead of created_by
+    if (existingProgress) {
       await supabase
         .from("user_progress")
         .update({
@@ -56,9 +90,8 @@ export default function PaymentSuccess() {
           enrolled: true,
           last_payment_id: paymentId,
         })
-        .eq("id", existing.id);
+        .eq("id", existingProgress.id);
     } else {
-      // ✅ FIX: Use user_id instead of created_by
       await supabase
         .from("user_progress")
         .insert({
