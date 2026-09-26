@@ -20,37 +20,26 @@ export async function getCurrentUser() {
   return mapUser(user);
 }
 
-// ── Google Sign-In (kept) ──
 export async function redirectToLogin() {
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
-    options: {
-      redirectTo: window.location.origin,
-    },
+    options: { redirectTo: window.location.origin },
   });
   if (error) throw error;
 }
 
-// ── NEW: Email/Password Sign In ──
 export async function signInWithEmail(email, password) {
   const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
+    email, password,
   });
   if (error) throw error;
   return mapUser(data.user);
 }
 
-// ── NEW: Email/Password Sign Up ──
 export async function signUpWithEmail(email, password, fullName = '') {
   const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: {
-        full_name: fullName,
-      },
-    },
+    email, password,
+    options: { data: { full_name: fullName } },
   });
   if (error) throw error;
   return mapUser(data.user);
@@ -66,4 +55,38 @@ export function onAuthStateChange(callback) {
   return supabase.auth.onAuthStateChange((_event, session) => {
     callback(session?.user ? mapUser(session.user) : null);
   });
+}
+
+// ── NEW: Check subscription status from backend ──
+export async function checkSubscription() {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return { subscribed: false, expiry_date: null };
+
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const response = await fetch(
+      `${supabaseUrl}/functions/v1/subscription-status`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    if (!response.ok) {
+      console.error('Subscription check failed:', response.status);
+      return { subscribed: false, expiry_date: null };
+    }
+
+    const data = await response.json();
+    return {
+      subscribed: data.subscribed === true,
+      expiry_date: data.expiry_date || null,
+    };
+  } catch (err) {
+    console.error('checkSubscription error:', err);
+    return { subscribed: false, expiry_date: null };
+  }
 }

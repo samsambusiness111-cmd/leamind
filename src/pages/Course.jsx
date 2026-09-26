@@ -7,9 +7,9 @@ import ExitDialog from "@/components/course/ExitDialog";
 import ProgressBar from "@/components/course/ProgressBar";
 import CertificateDownload from "@/components/course/CertificateDownload";
 import { createPageUrl } from "@/utils";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser, checkSubscription } from "@/lib/auth";
 import { supabase } from "@/api/supabaseClient";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Lock } from "lucide-react";
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,7 @@ export default function Course() {
 
   const [progress, setProgress] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [subscription, setSubscription] = useState({ subscribed: false, expiry_date: null });
   const [activeModuleId, setActiveModuleId] = useState(initModule);
   const [activeLessonIndex, setActiveLessonIndex] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -32,7 +33,11 @@ export default function Course() {
     const user = await getCurrentUser();
     if (!user) { navigate("/"); return; }
 
-    // ✅ FIX: Use user_id instead of email
+    // Check subscription from backend
+    const sub = await checkSubscription();
+    setSubscription(sub);
+
+    // Load progress
     const { data: userRecord, error } = await supabase
       .from("user_progress")
       .select("*")
@@ -52,7 +57,6 @@ export default function Course() {
         setActiveLessonIndex(userRecord.current_lesson || 0);
       }
     } else {
-      // ✅ FIX: Use user_id instead of created_by
       const { data: record, error: createError } = await supabase
         .from("user_progress")
         .insert({
@@ -83,6 +87,9 @@ export default function Course() {
   const completedLessons = progress?.completed_lessons || [];
   const activeModule = MODULES.find(m => m.id === activeModuleId);
   const activeLesson = activeModule?.lessons[activeLessonIndex];
+
+  // Premium check
+  const isPremium = subscription.subscribed === true;
 
   const saveProgress = async (updates) => {
     if (!progress?.id) return;
@@ -136,6 +143,7 @@ export default function Course() {
   };
 
   const handleSelectModule = (moduleId) => {
+    if (!isPremium) return;
     setActiveModuleId(moduleId);
     setActiveLessonIndex(0);
     saveProgress({ current_module: moduleId, current_lesson: 0 });
@@ -143,6 +151,7 @@ export default function Course() {
   };
 
   const handleSelectLesson = (idx) => {
+    if (!isPremium) return;
     setActiveLessonIndex(idx);
     saveProgress({ current_module: activeModuleId, current_lesson: idx });
     setSidebarOpen(false);
@@ -160,6 +169,29 @@ export default function Course() {
     );
   }
 
+  // ── LOCKED VIEW ──
+  if (!isPremium) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center px-6 text-center">
+        <div className="w-20 h-20 rounded-full bg-slate-100 flex items-center justify-center mb-6">
+          <Lock className="w-8 h-8 text-slate-400" />
+        </div>
+        <h1 className="text-2xl font-extrabold text-slate-900 mb-3">Premium access required</h1>
+        <p className="text-slate-500 text-base max-w-md mb-8">
+          Go to leamindai.com to upgrade and unlock 28-day access.
+        </p>
+        <Button
+          variant="outline"
+          onClick={() => navigate(createPageUrl("Home"))}
+          className="border-slate-200 text-slate-600"
+        >
+          Back to Home
+        </Button>
+      </div>
+    );
+  }
+
+  // ── UNLOCKED VIEW ──
   return (
     <div className="min-h-screen bg-slate-50 flex" {...touchHandlers}>
       <div className="hidden lg:block w-72 border-r border-slate-200 bg-white fixed inset-y-0 left-0 z-30">

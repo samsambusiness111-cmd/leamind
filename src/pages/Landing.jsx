@@ -1,9 +1,8 @@
 import React, { useState, useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import { CheckCircle2, Star, Zap, Lock, Rocket, Quote, Shield, Award, TrendingUp, Brain, Target, Users, BookOpen } from "lucide-react";
+import { CheckCircle2, Star, Zap, Lock, Rocket, Shield, Award, TrendingUp, Brain, Target, Users, BookOpen } from "lucide-react";
 import FreeLessonSection from "@/components/landing/FreeLessonSection";
-import { openRazorpayCheckout } from "@/utils/razorpay";
-import { getCurrentUser, redirectToLogin } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/auth";
 import { LOGO_URL } from "@/lib/constants";
 import EmailAuthModal from "@/components/EmailAuthModal";
 
@@ -130,8 +129,6 @@ function FeatureCard({ icon: Icon, title, text, color }) {
 }
 
 export default function Landing() {
-  const [loading, setLoading] = useState(false);
-  const [payLoading, setPayLoading] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
 
   const handleSignUp = async () => {
@@ -143,23 +140,6 @@ export default function Landing() {
     }
   };
 
-  const handlePayment = async () => {
-    setPayLoading(true);
-    const user = await getCurrentUser();
-    if (!user) {
-      setAuthModalOpen(true);
-      setPayLoading(false);
-      return;
-    }
-    openRazorpayCheckout({
-      onSuccess: (paymentId) => {
-        window.location.href = `/payment-success?razorpay_payment_id=${paymentId}`;
-      },
-      onFailure: () => setPayLoading(false),
-      onDismiss: () => setPayLoading(false),
-    });
-  };
-
   return (
     <div className="min-h-[100dvh] w-full overflow-x-hidden font-sans" style={{ background: "#000000", color: "#ffffff" }}>
 
@@ -167,10 +147,10 @@ export default function Landing() {
       <div className="fixed bottom-0 left-0 right-0 z-50 sm:hidden px-3 pb-safe"
         style={{ background: "linear-gradient(to top, rgba(0,0,0,1) 80%, rgba(0,0,0,0.95) 90%, transparent)", paddingBottom: "max(env(safe-area-inset-bottom, 12px), 12px)", paddingTop: "12px" }}>
         <div className="flex gap-2 mb-2">
-          <button onClick={handleSignUp} disabled={loading}
-            className="flex-1 text-black font-black text-base h-14 rounded-2xl flex items-center justify-center gap-1.5 active:scale-[0.98] transition-transform disabled:opacity-70"
+          <button onClick={handleSignUp}
+            className="flex-1 text-black font-black text-base h-14 rounded-2xl flex items-center justify-center gap-1.5 active:scale-[0.98] transition-transform"
             style={{ background: "linear-gradient(135deg, #34d399, #10b981)", boxShadow: "0 0 40px rgba(52,211,153,0.5)" }}>
-            {loading ? "..." : "🚀 Sign Up Free →"}
+            🚀 Sign Up Free →
           </button>
         </div>
         <p className="text-white/30 text-xs text-center flex items-center justify-center gap-2">
@@ -178,7 +158,7 @@ export default function Landing() {
         </p>
       </div>
 
-      {/* ── NAV ── */}
+      {/* NAV */}
       <nav className="sticky top-0 z-50 border-b border-white/5" style={{ background: "rgba(0,0,0,0.95)", backdropFilter: "blur(24px)" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
@@ -190,15 +170,15 @@ export default function Landing() {
               <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
               Early access open
             </span>
-            <button onClick={handleSignUp} disabled={loading}
-              className="bg-emerald-500 hover:bg-emerald-400 text-black text-sm font-black px-4 sm:px-5 py-2.5 rounded-full transition-colors shadow-[0_0_20px_rgba(52,211,153,0.25)] disabled:opacity-70">
-              {loading ? "..." : "Sign Up →"}
+            <button onClick={handleSignUp}
+              className="bg-emerald-500 hover:bg-emerald-400 text-black text-sm font-black px-4 sm:px-5 py-2.5 rounded-full transition-colors shadow-[0_0_20px_rgba(52,211,153,0.25)]">
+              Sign Up →
             </button>
           </div>
         </div>
       </nav>
 
-      {/* HERO — 3 COLUMN */}
+      {/* HERO */}
       <section className="px-0 sm:px-4 pt-10 sm:pt-20 pb-12 sm:pb-24 relative overflow-hidden" style={{ background: "#000000" }}>
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] pointer-events-none"
           style={{ background: "radial-gradient(ellipse, rgba(52,211,153,0.08) 0%, transparent 65%)" }} />
@@ -224,7 +204,6 @@ export default function Landing() {
             </div>
 
             <div className="text-center">
-
               <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
                 className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-4 py-2 mb-6 sm:mb-8">
                 <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
@@ -302,11 +281,10 @@ export default function Landing() {
                   </div>
                   <button
                     onClick={handleSignUp}
-                    disabled={loading}
-                    className="shrink-0 h-12 px-7 rounded-xl font-black text-black text-base disabled:opacity-70 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                    className="shrink-0 h-12 px-7 rounded-xl font-black text-black text-base transition-all hover:scale-[1.02] active:scale-[0.98]"
                     style={{ background: "linear-gradient(135deg, #34d399, #10b981)", boxShadow: "0 0 30px rgba(52,211,153,0.3)" }}
                   >
-                    {loading ? "Loading..." : "Sign Up Free →"}
+                    Sign Up Free →
                   </button>
                 </div>
               </motion.div>
@@ -314,13 +292,12 @@ export default function Landing() {
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.5 }}>
                 <button
                   onClick={handleSignUp}
-                  disabled={loading}
-                  className="flex items-center justify-center gap-2 w-full max-w-sm mx-auto h-12 px-6 rounded-2xl font-bold text-white/70 text-base border border-white/10 hover:border-white/20 transition-colors disabled:opacity-70"
+                  className="flex items-center justify-center gap-2 w-full max-w-sm mx-auto h-12 px-6 rounded-2xl font-bold text-white/70 text-base border border-white/10 hover:border-white/20 transition-colors"
                   style={{ background: "rgba(255,255,255,0.04)" }}
                 >
-                  {loading ? "Loading..." : "🚀 Sign Up →"}
+                  🚀 Sign Up →
                 </button>
-                <p className="text-white/30 text-sm mt-3">✅ Free to browse · Pay ₹500 to unlock all courses</p>
+                <p className="text-white/30 text-sm mt-3">✅ Free to browse · Pay ₹500 on leamindai.com to unlock</p>
               </motion.div>
 
               <div className="lg:hidden mt-8 text-left">
@@ -414,12 +391,10 @@ export default function Landing() {
 
       <FreeLessonSection onSignUp={handleSignUp} />
 
-      {/* STATS */}
       <FadeIn>
         <section className="py-12 sm:py-20 px-4 border-t border-white/5" style={{ background: "#000000" }}>
           <div className="max-w-4xl mx-auto text-center">
             <SectionLabel>What's Inside</SectionLabel>
-
             <h2 className="text-2xl sm:text-4xl font-black text-white mb-8 sm:mb-12 tracking-tight">Everything You Get</h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
               {[
@@ -444,7 +419,6 @@ export default function Landing() {
         </section>
       </FadeIn>
 
-      {/* TOOLS */}
       <FadeIn>
         <section className="py-12 sm:py-20 px-4 border-t border-white/5" style={{ background: "#050505" }}>
           <div className="max-w-5xl mx-auto">
@@ -472,7 +446,6 @@ export default function Landing() {
         </section>
       </FadeIn>
 
-      {/* HOW IT WORKS */}
       <FadeIn>
         <section className="py-12 sm:py-20 px-4 border-t border-white/5" style={{ background: "#000000" }}>
           <div className="max-w-4xl mx-auto text-center">
@@ -496,9 +469,9 @@ export default function Landing() {
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
               {[
-                { icon: <Lock className="w-6 h-6 text-indigo-400" />, step: "01", title: "Sign up with Google", sub: "One-click. 10 seconds. No forms.", bg: "from-indigo-500/10 to-indigo-600/5", border: "border-indigo-500/20" },
+                { icon: <Lock className="w-6 h-6 text-indigo-400" />, step: "01", title: "Sign up", sub: "One-click. 10 seconds. No forms.", bg: "from-indigo-500/10 to-indigo-600/5", border: "border-indigo-500/20" },
                 { icon: <Zap className="w-6 h-6 text-yellow-400" />, step: "02", title: "Explore the platform", sub: "Browse all 10 AI tool courses and try a free lesson.", bg: "from-yellow-500/10 to-yellow-600/5", border: "border-yellow-500/20" },
-                { icon: <Rocket className="w-6 h-6 text-emerald-400" />, step: "03", title: "Start your first lesson", sub: "Instant access. First certificate in hours.", bg: "from-emerald-500/10 to-emerald-600/5", border: "border-emerald-500/20" },
+                { icon: <Rocket className="w-6 h-6 text-emerald-400" />, step: "03", title: "Unlock on leamindai.com", sub: "Pay ₹500 on our website. Then come back to the app.", bg: "from-emerald-500/10 to-emerald-600/5", border: "border-emerald-500/20" },
               ].map((s, i) => (
                 <motion.div key={s.step}
                   initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.12, duration: 0.45 }}
@@ -516,7 +489,6 @@ export default function Landing() {
         </section>
       </FadeIn>
 
-      {/* TRUST STRIP */}
       <FadeIn>
         <section className="py-8 sm:py-10 px-4 border-t border-b border-white/4" style={{ background: "#030303" }}>
           <div className="max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
@@ -536,7 +508,6 @@ export default function Landing() {
         </section>
       </FadeIn>
 
-      {/* BEFORE YOU DECIDE */}
       <FadeIn>
         <section className="py-12 sm:py-20 px-4 border-t border-white/5" style={{ background: "#040408" }}>
           <div className="max-w-3xl mx-auto">
@@ -563,7 +534,7 @@ export default function Landing() {
                 {
                   concern: "\"Is my payment safe? Will I get charged again later?\"",
                   icon: "🔒",
-                  response: "Payment is processed by Razorpay — India's most trusted payment gateway, used by Swiggy, Zepto, and thousands of businesses. This is a one-time payment. There is no subscription, no auto-renewal, and no hidden charges. You pay once, you get 28-day full access. That's it.",
+                  response: "Payment is processed by Razorpay on leamindai.com — India's most trusted payment gateway. This is a one-time payment. There is no subscription, no auto-renewal, and no hidden charges. You pay once, you get 28-day full access.",
                   tag: "Payment Safety"
                 },
               ].map((item, i) => (
@@ -598,7 +569,6 @@ export default function Landing() {
         </section>
       </FadeIn>
 
-      {/* WHY LEAMIND */}
       <FadeIn>
         <section className="py-12 sm:py-20 px-4 border-t border-white/5 relative overflow-hidden" style={{ background: "#050505" }}>
           <div className="absolute top-0 right-0 w-[500px] h-[500px] pointer-events-none"
@@ -614,13 +584,12 @@ export default function Landing() {
               <FeatureCard icon={Award} title="10 Verified Certificates" text="Download PDF certificates for your resume and LinkedIn." color="bg-gradient-to-br from-yellow-500 to-orange-600" />
               <FeatureCard icon={Users} title="Built for Indian Students" text="Priced for India. Paid via UPI, GPay, PhonePe. No credit card needed." color="bg-gradient-to-br from-emerald-500 to-teal-600" />
               <FeatureCard icon={Zap} title="Instant Access" text="Sign up and start learning in under 60 seconds. No waiting." color="bg-gradient-to-br from-rose-500 to-red-600" />
-              <FeatureCard icon={Shield} title="One-Time Payment" text="₹500 once. Lifetime access. No subscription. No auto-renewal." color="bg-gradient-to-br from-teal-500 to-cyan-600" />
+              <FeatureCard icon={Shield} title="One-Time Payment" text="₹500 once. 28-day access. No subscription. No auto-renewal." color="bg-gradient-to-br from-teal-500 to-cyan-600" />
             </div>
           </div>
         </section>
       </FadeIn>
 
-      {/* FINAL CTA */}
       <FadeIn>
         <section className="py-16 sm:py-28 px-4 text-center relative overflow-hidden border-t border-white/5" style={{ background: "#000000" }}>
           <div className="absolute inset-0 pointer-events-none"
@@ -638,18 +607,16 @@ export default function Landing() {
             </div>
             <button
               onClick={handleSignUp}
-              disabled={loading}
-              className="flex items-center justify-center gap-2 w-full max-w-sm mx-auto h-14 sm:h-16 px-6 sm:px-10 rounded-2xl font-black text-black text-lg sm:text-xl disabled:opacity-70"
+              className="flex items-center justify-center gap-2 w-full max-w-sm mx-auto h-14 sm:h-16 px-6 sm:px-10 rounded-2xl font-black text-black text-lg sm:text-xl"
               style={{ background: "linear-gradient(135deg, #34d399, #10b981)", boxShadow: "0 0 50px rgba(52,211,153,0.35), 0 4px 24px rgba(0,0,0,0.5)" }}
             >
-              {loading ? "Loading..." : "🚀 Sign Up Free →"}
+              🚀 Sign Up Free →
             </button>
-            <p className="text-white/25 text-sm mt-3">Free to join · Unlock full access after sign up</p>
+            <p className="text-white/25 text-sm mt-3">Free to join · Pay ₹500 on leamindai.com to unlock</p>
           </div>
         </section>
       </FadeIn>
 
-      {/* FOUNDER'S NOTE */}
       <FadeIn>
         <section className="py-10 sm:py-16 px-4 border-t border-white/5" style={{ background: "#040404" }}>
           <div className="max-w-2xl mx-auto">
