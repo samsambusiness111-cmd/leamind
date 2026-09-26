@@ -23,6 +23,8 @@ export default function Home() {
   const [streakModal, setStreakModal] = useState({ open: false, type: null });
   const navigate = useNavigate();
 
+  const isApp = typeof window !== "undefined" && window.Capacitor?.isNativePlatform?.() === true;
+
   const loadData = async () => {
     try {
       const u = await getCurrentUser();
@@ -33,11 +35,9 @@ export default function Home() {
       }
       setUser(u);
 
-      // Check subscription from backend
       const sub = await checkSubscription();
       setSubscription(sub);
 
-      // Load progress
       const { data: prog, error } = await supabase
         .from("user_progress")
         .select("*")
@@ -123,7 +123,6 @@ export default function Home() {
   const currentModulePct = Math.round(currentModuleDone / currentModule.lessons.length * 100);
   const streak = progress?.streak_count || 0;
 
-  // Subscription-driven premium status
   const isPremium = subscription.subscribed === true;
   const formatExpiry = (isoDate) => {
     if (!isoDate) return "";
@@ -140,7 +139,6 @@ export default function Home() {
     <div className="min-h-screen bg-[#F7F8FC] font-inter pb-tab-safe md:pb-0" {...touchHandlers}>
       <MobileHeader />
 
-      {/* ── NAV ── */}
       <nav className="bg-white border-b border-slate-100 sticky top-0 z-40 shadow-sm" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
@@ -175,14 +173,33 @@ export default function Home() {
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 space-y-12">
 
-        {/* PAYWALL BANNER — TEXT ONLY, NO BUTTON */}
+        {/* PAYWALL BANNER — BUTTON ON WEBSITE, TEXT ONLY IN APP */}
         {!isPremium && (
           <div className="bg-[#1A365D] rounded-2xl p-6 text-white text-center border-2 border-yellow-400">
             <div className="text-3xl mb-2">🔒</div>
             <h2 className="text-xl font-black mb-2">Premium access required</h2>
-            <p className="text-white/80 text-sm">
-              Go to leamindai.com to upgrade and unlock 28-day access.
-            </p>
+
+            {isApp ? (
+              // IN APP: text only, no button (Google-compliant)
+              <p className="text-white/80 text-sm">
+                Go to leamindai.com to upgrade and unlock 28-day access.
+              </p>
+            ) : (
+              // ON WEBSITE: show the pay button
+              <>
+                <p className="text-white/80 text-sm mb-4">
+                  Unlock 28-day access to all 10 AI courses for ₹500 (one-time).
+                </p>
+                <a
+                  href="https://rzp.io/rzp/2BWjEFKD"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block bg-green-500 hover:bg-green-400 text-white font-black text-lg px-8 py-4 rounded-xl transition-all hover:scale-105 shadow-lg shadow-green-500/30"
+                >
+                  PAY ₹500 NOW →
+                </a>
+              </>
+            )}
           </div>
         )}
 
@@ -192,7 +209,6 @@ export default function Home() {
           </div>
         )}
 
-        {/* HERO */}
         <section>
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
             <div className="flex flex-col md:flex-row">
@@ -221,10 +237,19 @@ export default function Home() {
                     <Button onClick={handleStart} className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2 px-6 py-5 rounded-xl font-semibold text-sm">
                       {progress?.enrolled ? "Continue Learning" : "Start Learning"} <ArrowRight className="w-4 h-4" />
                     </Button>
-                  ) : (
+                  ) : isApp ? (
                     <div className="inline-flex items-center gap-2 bg-slate-100 text-slate-500 px-6 py-3 rounded-xl font-semibold text-sm">
                       <Lock className="w-4 h-4" /> Go to leamindai.com to unlock
                     </div>
+                  ) : (
+                    <a
+                      href="https://rzp.io/rzp/2BWjEFKD"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 bg-green-500 hover:bg-green-400 text-white px-6 py-3 rounded-xl font-semibold text-sm transition-all hover:scale-[1.02]"
+                    >
+                      <Crown className="w-4 h-4" /> Unlock Access — ₹500
+                    </a>
                   )}
                   {progress?.enrolled && (
                     <Button variant="outline" onClick={() => navigate(createPageUrl("Summary"))} className="gap-2 px-6 py-5 rounded-xl font-semibold text-sm border-slate-200 text-slate-600">
@@ -245,7 +270,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* STATS */}
         <section className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
             { value: "10", label: "AI Tools Covered", icon: "🧠" },
@@ -261,7 +285,6 @@ export default function Home() {
           ))}
         </section>
 
-        {/* MASTERY PATH */}
         <section>
           <div className="flex items-center justify-between mb-5">
             <div>
@@ -311,7 +334,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ALL COURSES GRID */}
         <section>
           <div className="flex items-center justify-between mb-5">
             <div>
@@ -373,7 +395,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* WHAT YOU'LL ACHIEVE */}
         <section className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
           <div className="p-8 border-b border-slate-50">
             <p className="text-xs font-bold tracking-widest text-indigo-500 uppercase mb-1">Outcomes</p>
@@ -400,7 +421,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* HOW IT WORKS */}
         <section className="bg-white rounded-2xl border border-slate-100 shadow-sm p-8">
           <p className="text-xs font-bold tracking-widest text-indigo-500 uppercase mb-1">Learning Flow</p>
           <h2 className="text-xl font-bold text-slate-900 mb-1">How Each Course Works</h2>
@@ -422,7 +442,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* TESTIMONIALS */}
         <section>
           <div className="text-center mb-7">
             <p className="text-xs font-bold tracking-widest text-indigo-500 uppercase mb-1">Student Reviews</p>
@@ -449,12 +468,10 @@ export default function Home() {
           </div>
         </section>
 
-        {/* FAQ */}
         <section id="faq">
           <FAQ />
         </section>
 
-        {/* FOOTER */}
         <footer className="text-center pb-8 pt-4 border-t border-slate-100">
           <div className="flex items-center justify-center gap-2.5 mb-2">
             <img src={LOGO_URL} alt="Leamind" className="h-7 w-7 rounded-lg object-cover" />
