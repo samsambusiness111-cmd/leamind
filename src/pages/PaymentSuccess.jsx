@@ -28,7 +28,7 @@ export default function PaymentSuccess() {
     const expires = new Date(Date.now() + 28 * 24 * 60 * 60 * 1000).toISOString();
     const today = new Date().toISOString().slice(0, 10);
 
-    // ── 1. WRITE TO SUBSCRIPTIONS TABLE (this is what the app checks now) ──
+    // ── 1. WRITE TO SUBSCRIPTIONS TABLE ──
     const { data: existingSub, error: subCheckError } = await supabase
       .from("subscriptions")
       .select("id, razorpay_payment_id")
@@ -39,9 +39,8 @@ export default function PaymentSuccess() {
       console.error("Subscription check error:", subCheckError);
     }
 
-    // Skip if same payment already applied
     if (existingSub?.razorpay_payment_id === paymentId) {
-      navigate("/Course");
+      window.location.href = "/Course";
       return;
     }
 
@@ -69,7 +68,7 @@ export default function PaymentSuccess() {
         });
     }
 
-    // ── 2. ALSO UPDATE user_progress (for backwards compatibility) ──
+    // ── 2. ALSO UPDATE user_progress ──
     const { data: existingProgress } = await supabase
       .from("user_progress")
       .select("id, last_payment_id")
@@ -77,7 +76,7 @@ export default function PaymentSuccess() {
       .maybeSingle();
 
     if (existingProgress?.last_payment_id === paymentId) {
-      navigate("/Course");
+      window.location.href = "/Course";
       return;
     }
 
@@ -111,7 +110,9 @@ export default function PaymentSuccess() {
         });
     }
 
-    navigate("/Course");
+    // Small delay to ensure Supabase write commits before full reload
+    await new Promise((r) => setTimeout(r, 1000));
+    window.location.href = "/Course";
   };
 
   return null;
