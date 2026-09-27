@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from "react";
 import SubscriptionModal from "./SubscriptionModal";
-import { getCurrentUser } from "@/lib/auth";
-import { supabase } from "@/api/supabaseClient";
+import { getCurrentUser, checkSubscription } from "@/lib/auth";
 
 export default function SubscriptionGuard({ children }) {
   const [status, setStatus] = useState("loading");
 
   useEffect(() => {
-    checkSubscription();
+    verify();
   }, []);
 
-  const checkSubscription = async () => {
+  const verify = async () => {
     try {
       const user = await getCurrentUser();
       if (!user) {
@@ -18,31 +17,16 @@ export default function SubscriptionGuard({ children }) {
         return;
       }
 
-      // ✅ Use user_id to fetch progress
-      const { data: prog, error } = await supabase
-        .from("user_progress")
-        .select("*")
-        .eq("user_id", user.id)
-        .maybeSingle();
+      // ✅ Unified: read from subscriptions table via checkSubscription()
+      const sub = await checkSubscription();
 
-      if (error) {
-        console.error("Error fetching progress:", error);
-        setStatus("locked");
-        return;
-      }
-
-      // ✅ If no record exists, user is locked
-      if (!prog) {
-        setStatus("locked");
-        return;
-      }
-
-      // ✅ Check subscription status
-      if (prog.subscription_status === "active" && prog.subscription_expires) {
-        const expired = new Date(prog.subscription_expires) < new Date();
-        setStatus(expired ? "expired" : "active");
-      } else if (prog.subscription_status === "expired") {
-        setStatus("expired");
+      if (sub.subscribed === true) {
+        // Double-check expiry
+        if (sub.expiry_date && new Date(sub.expiry_date) < new Date()) {
+          setStatus("expired");
+        } else {
+          setStatus("active");
+        }
       } else {
         setStatus("locked");
       }

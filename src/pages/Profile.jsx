@@ -4,7 +4,7 @@ import { MODULES } from "@/components/course/courseData";
 import CertificateDownload from "@/components/course/CertificateDownload";
 import ProgressBar from "@/components/course/ProgressBar";
 import { createPageUrl } from "@/utils";
-import { getCurrentUser, signOut } from "@/lib/auth";
+import { getCurrentUser, signOut, checkSubscription } from "@/lib/auth";
 import { supabase } from "@/api/supabaseClient";
 import { LOGO_URL } from "@/lib/constants";
 import { Award, Flame, CheckCircle2, Save, ChevronRight, LogOut, BookOpen, Trophy, Shield, Trash2 } from "lucide-react";
@@ -25,6 +25,7 @@ export default function Profile() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [progress, setProgress] = useState(null);
+  const [subscription, setSubscription] = useState({ subscribed: false, expiry_date: null });
   const [loading, setLoading] = useState(true);
   const [displayName, setDisplayName] = useState("");
   const [saving, setSaving] = useState(false);
@@ -52,7 +53,6 @@ export default function Profile() {
   const handleDeleteAccount = async () => {
     setDeleting(true);
     try {
-      // ✅ FIX: Delete by user_id instead of email
       if (user?.id) {
         await supabase
           .from("user_progress")
@@ -73,12 +73,17 @@ export default function Profile() {
       setLoading(false);
       return;
     }
-    // ✅ FIX: Use user.id instead of email
+
+    // Check subscription from the NEW system (subscriptions table)
+    const sub = await checkSubscription();
+    setSubscription(sub);
+
     const { data: userRecord, error } = await supabase
       .from("user_progress")
       .select("*")
       .eq("user_id", u.id)
       .maybeSingle();
+
     if (userRecord) {
       setProgress(userRecord);
       setDisplayName(userRecord.display_name || u.full_name || "");
@@ -117,8 +122,11 @@ export default function Profile() {
   const completedModules = MODULES.filter(m => m.lessons.every(l => completedLessons.includes(l.id)));
   const streak = progress?.streak_count || 0;
   const longestStreak = progress?.longest_streak || 0;
-  const isActive = progress?.subscription_status === "active";
-  const daysLeft = Math.min(28, daysRemaining(progress?.subscription_expires));
+
+  // ── UNIFIED: reads from subscriptions table via checkSubscription() ──
+  const isActive = subscription.subscribed === true;
+  const subscriptionExpires = subscription.expiry_date;
+  const daysLeft = Math.min(28, daysRemaining(subscriptionExpires));
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center bg-[#F7F8FC]">
@@ -158,7 +166,6 @@ export default function Profile() {
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
           <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 h-28" />
           <div className="px-6 pb-6">
-            {/* Avatar row */}
             <div className="flex items-end justify-between -mt-10 mb-5">
               <div className="w-20 h-20 rounded-2xl bg-indigo-600 border-4 border-white shadow-lg flex items-center justify-center text-2xl font-extrabold text-white">
                 {initials}
@@ -173,14 +180,12 @@ export default function Profile() {
               </div>
             </div>
 
-            {/* Identity */}
             <div className="mb-5 p-4 bg-slate-50 rounded-xl border border-slate-100">
               <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1">Account</p>
               <p className="text-lg font-extrabold text-slate-900 leading-tight">{displayName || user?.full_name || "Learner"}</p>
               <p className="text-sm text-slate-500 mt-0.5">{user?.email}</p>
             </div>
 
-            {/* Edit name for certificates */}
             <div>
               <p className="text-xs text-slate-500 font-semibold mb-2">Certificate Name</p>
               <div className="flex gap-2">
@@ -211,7 +216,7 @@ export default function Profile() {
           </div>
           <div className="flex flex-col sm:flex-row gap-4">
             <div className={`flex-1 rounded-xl p-4 border ${isActive ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200"}`}>
-              <p className="text-xs font-semibold uppercase tracking-wider mb-1 ${isActive ? 'text-green-600' : 'text-red-500'}">
+              <p className={`text-xs font-semibold uppercase tracking-wider mb-1 ${isActive ? 'text-green-600' : 'text-red-500'}`}>
                 Status
               </p>
               <p className={`text-xl font-extrabold ${isActive ? "text-green-700" : "text-red-600"}`}>
@@ -227,7 +232,7 @@ export default function Profile() {
                 <div className="flex-1 rounded-xl p-4 bg-slate-50 border border-slate-100">
                   <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Expires</p>
                   <p className="text-sm font-bold text-slate-700">
-                    {progress?.subscription_expires ? new Date(progress.subscription_expires).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—"}
+                    {subscriptionExpires ? new Date(subscriptionExpires).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—"}
                   </p>
                 </div>
               </>
@@ -366,7 +371,6 @@ export default function Profile() {
 
       </div>
 
-      {/* Delete Account Confirmation Modal */}
       {deleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">

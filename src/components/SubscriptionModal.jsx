@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { CheckCircle2, Award, Zap, BookOpen, RefreshCw, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LOGO_URL } from "@/lib/constants";
@@ -13,10 +13,7 @@ const FEATURES = [
   { icon: RefreshCw, text: "Renew every 28 days to keep access" },
 ];
 
-
-
 export default function SubscriptionModal({ open, onClose, hardPaywall = false, expired = false }) {
-  
   const handlePay = () => {
     window.open("https://rzp.io/rzp/2BWjEFKD", "_blank");
   };
@@ -44,7 +41,6 @@ export default function SubscriptionModal({ open, onClose, hardPaywall = false, 
 function PaywallContent({ onPay, hardPaywall, expired }) {
   return (
     <>
-      {/* Header */}
       <div className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 px-8 pt-8 pb-10 relative text-center">
         <div className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
           <Lock className="w-4 h-4 text-white/60" />
@@ -68,7 +64,6 @@ function PaywallContent({ onPay, hardPaywall, expired }) {
         <p className="text-white/60 text-xs mt-1">No auto-renewal · Renew manually each cycle</p>
       </div>
 
-      {/* Body */}
       <div className="px-8 py-6">
         {hardPaywall && (
           <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-5 flex items-start gap-3">
