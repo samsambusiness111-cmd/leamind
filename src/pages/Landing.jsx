@@ -131,6 +131,9 @@ function FeatureCard({ icon: Icon, title, text, color }) {
 export default function Landing() {
   const [authModalOpen, setAuthModalOpen] = useState(false);
 
+  // ── Detect if running inside the Android/iOS Capacitor app ──
+  const isApp = typeof window !== "undefined" && window.Capacitor?.isNativePlatform?.() === true;
+
   const handleSignUp = async () => {
     const user = await getCurrentUser();
     if (user) {
@@ -140,19 +143,39 @@ export default function Landing() {
     }
   };
 
+  // In app, "Continue" just opens the login/signup modal — never opens browser
+  const handleContinue = () => {
+    setAuthModalOpen(true);
+  };
+
   return (
     <div className="min-h-[100dvh] w-full overflow-x-hidden font-sans" style={{ background: "#000000", color: "#ffffff" }}>
 
       {/* ── STICKY MOBILE CTA ── */}
       <div className="fixed bottom-0 left-0 right-0 z-50 sm:hidden px-3 pb-safe"
         style={{ background: "linear-gradient(to top, rgba(0,0,0,1) 80%, rgba(0,0,0,0.95) 90%, transparent)", paddingBottom: "max(env(safe-area-inset-bottom, 12px), 12px)", paddingTop: "12px" }}>
-        <div className="flex gap-2 mb-2">
-          <button onClick={handleSignUp}
-            className="flex-1 text-black font-black text-base h-14 rounded-2xl flex items-center justify-center gap-1.5 active:scale-[0.98] transition-transform"
-            style={{ background: "linear-gradient(135deg, #34d399, #10b981)", boxShadow: "0 0 40px rgba(52,211,153,0.5)" }}>
-            🚀 Sign Up Free →
-          </button>
-        </div>
+        {isApp ? (
+          <>
+            <div className="mb-2 text-center">
+              <p className="text-white/70 text-sm font-semibold">Visit leamindai.com to upgrade</p>
+            </div>
+            <button onClick={handleContinue}
+              className="w-full text-black font-black text-base h-14 rounded-2xl flex items-center justify-center gap-1.5 active:scale-[0.98] transition-transform"
+              style={{ background: "linear-gradient(135deg, #34d399, #10b981)", boxShadow: "0 0 40px rgba(52,211,153,0.5)" }}>
+              Continue →
+            </button>
+          </>
+        ) : (
+          <>
+            <div className="flex gap-2 mb-2">
+              <button onClick={handleSignUp}
+                className="flex-1 text-black font-black text-base h-14 rounded-2xl flex items-center justify-center gap-1.5 active:scale-[0.98] transition-transform"
+                style={{ background: "linear-gradient(135deg, #34d399, #10b981)", boxShadow: "0 0 40px rgba(52,211,153,0.5)" }}>
+                🚀 Sign Up Free →
+              </button>
+            </div>
+          </>
+        )}
         <p className="text-white/30 text-xs text-center flex items-center justify-center gap-2">
           <span className="inline-block w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" /> UPI · GPay · PhonePe · Cards accepted
         </p>
@@ -170,10 +193,16 @@ export default function Landing() {
               <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
               Early access open
             </span>
-            <button onClick={handleSignUp}
-              className="bg-emerald-500 hover:bg-emerald-400 text-black text-sm font-black px-4 sm:px-5 py-2.5 rounded-full transition-colors shadow-[0_0_20px_rgba(52,211,153,0.25)]">
-              Sign Up →
-            </button>
+            {isApp ? (
+              <span className="text-white/50 text-sm font-semibold px-3 py-2">
+                Visit leamindai.com
+              </span>
+            ) : (
+              <button onClick={handleSignUp}
+                className="bg-emerald-500 hover:bg-emerald-400 text-black text-sm font-black px-4 sm:px-5 py-2.5 rounded-full transition-colors shadow-[0_0_20px_rgba(52,211,153,0.25)]">
+                Sign Up →
+              </button>
+            )}
           </div>
         </div>
       </nav>
@@ -279,25 +308,53 @@ export default function Landing() {
                     </div>
                     <p className="text-white/25 text-xs mt-1">UPI · GPay · PhonePe · Cards — all accepted</p>
                   </div>
-                  <button
-                    onClick={handleSignUp}
-                    className="shrink-0 h-12 px-7 rounded-xl font-black text-black text-base transition-all hover:scale-[1.02] active:scale-[0.98]"
-                    style={{ background: "linear-gradient(135deg, #34d399, #10b981)", boxShadow: "0 0 30px rgba(52,211,153,0.3)" }}
-                  >
-                    Sign Up Free →
-                  </button>
+                  {isApp ? (
+                    <div className="shrink-0 text-center">
+                      <p className="text-white/70 text-sm font-semibold mb-1">Unlock on leamindai.com</p>
+                      <button
+                        onClick={handleContinue}
+                        className="h-12 px-7 rounded-xl font-black text-black text-base transition-all hover:scale-[1.02] active:scale-[0.98]"
+                        style={{ background: "linear-gradient(135deg, #34d399, #10b981)", boxShadow: "0 0 30px rgba(52,211,153,0.3)" }}
+                      >
+                        Continue →
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={handleSignUp}
+                      className="shrink-0 h-12 px-7 rounded-xl font-black text-black text-base transition-all hover:scale-[1.02] active:scale-[0.98]"
+                      style={{ background: "linear-gradient(135deg, #34d399, #10b981)", boxShadow: "0 0 30px rgba(52,211,153,0.3)" }}
+                    >
+                      Sign Up Free →
+                    </button>
+                  )}
                 </div>
               </motion.div>
 
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.5 }}>
-                <button
-                  onClick={handleSignUp}
-                  className="flex items-center justify-center gap-2 w-full max-w-sm mx-auto h-12 px-6 rounded-2xl font-bold text-white/70 text-base border border-white/10 hover:border-white/20 transition-colors"
-                  style={{ background: "rgba(255,255,255,0.04)" }}
-                >
-                  🚀 Sign Up →
-                </button>
-                <p className="text-white/30 text-sm mt-3">✅ Free to browse · Pay ₹500 on leamindai.com to unlock</p>
+                {isApp ? (
+                  <>
+                    <button
+                      onClick={handleContinue}
+                      className="flex items-center justify-center gap-2 w-full max-w-sm mx-auto h-12 px-6 rounded-2xl font-bold text-white/70 text-base border border-white/10 hover:border-white/20 transition-colors"
+                      style={{ background: "rgba(255,255,255,0.04)" }}
+                    >
+                      Continue →
+                    </button>
+                    <p className="text-white/30 text-sm mt-3">Free to browse · Pay ₹500 on leamindai.com to unlock</p>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={handleSignUp}
+                      className="flex items-center justify-center gap-2 w-full max-w-sm mx-auto h-12 px-6 rounded-2xl font-bold text-white/70 text-base border border-white/10 hover:border-white/20 transition-colors"
+                      style={{ background: "rgba(255,255,255,0.04)" }}
+                    >
+                      🚀 Sign Up →
+                    </button>
+                    <p className="text-white/30 text-sm mt-3">✅ Free to browse · Pay ₹500 on leamindai.com to unlock</p>
+                  </>
+                )}
               </motion.div>
 
               <div className="lg:hidden mt-8 text-left">
@@ -389,7 +446,7 @@ export default function Landing() {
         </div>
       </section>
 
-      <FreeLessonSection onSignUp={handleSignUp} />
+      <FreeLessonSection onSignUp={isApp ? handleContinue : handleSignUp} />
 
       <FadeIn>
         <section className="py-12 sm:py-20 px-4 border-t border-white/5" style={{ background: "#000000" }}>
@@ -605,14 +662,29 @@ export default function Landing() {
               <span className="text-emerald-400 text-5xl font-black">₹500</span>
               <span className="bg-emerald-500/20 text-emerald-300 text-sm font-black px-2.5 py-1 rounded-full border border-emerald-500/30">75% OFF</span>
             </div>
-            <button
-              onClick={handleSignUp}
-              className="flex items-center justify-center gap-2 w-full max-w-sm mx-auto h-14 sm:h-16 px-6 sm:px-10 rounded-2xl font-black text-black text-lg sm:text-xl"
-              style={{ background: "linear-gradient(135deg, #34d399, #10b981)", boxShadow: "0 0 50px rgba(52,211,153,0.35), 0 4px 24px rgba(0,0,0,0.5)" }}
-            >
-              🚀 Sign Up Free →
-            </button>
-            <p className="text-white/25 text-sm mt-3">Free to join · Pay ₹500 on leamindai.com to unlock</p>
+            {isApp ? (
+              <>
+                <button
+                  onClick={handleContinue}
+                  className="flex items-center justify-center gap-2 w-full max-w-sm mx-auto h-14 sm:h-16 px-6 sm:px-10 rounded-2xl font-black text-black text-lg sm:text-xl"
+                  style={{ background: "linear-gradient(135deg, #34d399, #10b981)", boxShadow: "0 0 50px rgba(52,211,153,0.35), 0 4px 24px rgba(0,0,0,0.5)" }}
+                >
+                  Continue →
+                </button>
+                <p className="text-white/25 text-sm mt-3">Free to browse · Pay ₹500 on leamindai.com to unlock</p>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={handleSignUp}
+                  className="flex items-center justify-center gap-2 w-full max-w-sm mx-auto h-14 sm:h-16 px-6 sm:px-10 rounded-2xl font-black text-black text-lg sm:text-xl"
+                  style={{ background: "linear-gradient(135deg, #34d399, #10b981)", boxShadow: "0 0 50px rgba(52,211,153,0.35), 0 4px 24px rgba(0,0,0,0.5)" }}
+                >
+                  🚀 Sign Up Free →
+                </button>
+                <p className="text-white/25 text-sm mt-3">Free to join · Pay ₹500 on leamindai.com to unlock</p>
+              </>
+            )}
           </div>
         </section>
       </FadeIn>
