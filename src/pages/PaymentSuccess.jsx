@@ -2,123 +2,66 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getCurrentUser } from "@/lib/auth";
 import { supabase } from "@/api/supabaseClient";
-import { CheckCircle2, Smartphone, Globe, Award } from "lucide-react";
+import { CheckCircle2, Smartphone, Globe, Award, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LOGO_URL } from "@/lib/constants";
 
-// 🔧 REPLACE WITH YOUR ACTUAL PACKAGE NAME (found in android/app/build.gradle)
 const PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=com.base69bab6ad27684c9ef4099d25.app";
 const DEEP_LINK = "leamind://open";
 
 export default function PaymentSuccess() {
   const navigate = useNavigate();
-  const [state, setState] = useState("loading"); // loading | success | error
+  const [state, setState] = useState("loading"); // loading | success | error | no-payment
   const [expiryDate, setExpiryDate] = useState(null);
   const [errorMsg, setErrorMsg] = useState("");
 
   useEffect(() => {
-    activateAndShow();
+    verifyAndActivate();
   }, []);
 
-  const activateAndShow = async () => {
+  const verifyAndActivate = async () => {
     try {
-      const params = new URLSearchParams(window.location.search);
-      const paymentId = params.get("razorpay_payment_id");
-
-      if (!paymentId) {
-        setState("error");
-        setErrorMsg("No payment ID found in URL.");
-        return;
-      }
-
+      // ── 1. Require logged-in user ──
       const user = await getCurrentUser();
       if (!user) {
-        navigate(`/?redirect=payment-success&razorpay_payment_id=${paymentId}`);
+        navigate(`/?redirect=payment-success`);
         return;
       }
 
-      const expires = new Date(Date.now() + 28 * 24 * 60 * 60 * 1000).toISOString();
-      const today = new Date().toISOString().slice(0, 10);
-
-      // ── 1. WRITE TO SUBSCRIPTIONS ──
-      const { data: existingSub, error: subCheckError } = await supabase
-        .from("subscriptions")
-        .select("id, razorpay_payment_id")
-        .eq("user_email", user.email)
-        .maybeSingle();
-
-      if (subCheckError) {
-        console.error("Subscription check error:", subCheckError);
+      // ── 2. Get session token ──
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        setState("error");
+        setErrorMsg("Your session expired. Please log in again.");
+        return;
       }
 
-      // If already processed with same payment, just show success
-      if (existingSub?.razorpay_payment_id === paymentId) {
-        setExpiryDate(existingSub.expiry_date || expires);
+      // ── 3. Call the server-side verify-payment function ──
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+
+      const res = await fetch(`${supabaseUrl}/functions/v1/verify-payment`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${session.access_token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setState("error");
+        setErrorMsg(data?.error || "Verification failed. Please try again.");
+        return;
+      }
+
+      if (data.success === true) {
+        setExpiryDate(data.expiry_date || null);
         setState("success");
-        return;
-      }
-
-      if (existingSub) {
-        await supabase
-          .from("subscriptions")
-          .update({
-            status: "active",
-            start_date: new Date().toISOString(),
-            expiry_date: expires,
-            razorpay_payment_id: paymentId,
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", existingSub.id);
       } else {
-        await supabase.from("subscriptions").insert({
-          user_id: user.id,
-          user_email: user.email,
-          status: "active",
-          start_date: new Date().toISOString(),
-          expiry_date: expires,
-          razorpay_payment_id: paymentId,
-        });
+        setState("no-payment");
+        setErrorMsg(data?.error || "No valid payment found for your account.");
       }
-
-      // ── 2. ALSO UPDATE user_progress (backwards compat) ──
-      const { data: existingProgress } = await supabase
-        .from("user_progress")
-        .select("id, last_payment_id")
-        .eq("user_id", user.id)
-        .maybeSingle();
-
-      if (existingProgress?.last_payment_id !== paymentId) {
-        if (existingProgress) {
-          await supabase
-            .from("user_progress")
-            .update({
-              subscription_status: "active",
-              subscription_expires: expires,
-              enrolled: true,
-              last_payment_id: paymentId,
-            })
-            .eq("id", existingProgress.id);
-        } else {
-          await supabase.from("user_progress").insert({
-            user_id: user.id,
-            user_email: user.email,
-            enrolled: true,
-            completed_lessons: [],
-            quiz_scores: {},
-            current_module: "deepseek",
-            current_lesson: 0,
-            subscription_status: "active",
-            subscription_expires: expires,
-            last_payment_id: paymentId,
-            streak_count: 1,
-            longest_streak: 1,
-            last_login_date: today,
-          });
-        }
-      }
-
-      setExpiryDate(expires);
-      setState("success");
     } catch (err) {
       console.error("PaymentSuccess error:", err);
       setErrorMsg(err.message || "Something went wrong.");
@@ -126,12 +69,10 @@ export default function PaymentSuccess() {
     }
   };
 
-  // ── Continue with App button ──
   const handleContinueWithApp = () => {
     const isMobile = /android|iphone|ipad|ipod/i.test(navigator.userAgent);
 
     if (isMobile) {
-      // Try deep link, fallback to Play Store after 1.8s
       const fallbackTimer = setTimeout(() => {
         window.location.href = PLAY_STORE_URL;
       }, 1800);
@@ -147,7 +88,6 @@ export default function PaymentSuccess() {
     }
   };
 
-  // ── Continue on Site button ──
   const handleContinueOnSite = () => {
     window.location.href = "/Course";
   };
@@ -157,8 +97,8 @@ export default function PaymentSuccess() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#F7F8FC] px-6">
         <div className="w-10 h-10 border-4 border-slate-200 border-t-indigo-600 rounded-full animate-spin mb-5" />
-        <p className="text-slate-600 font-semibold">Activating your subscription…</p>
-        <p className="text-slate-400 text-sm mt-1">Just a moment</p>
+        <p className="text-slate-600 font-semibold">Verifying your payment…</p>
+        <p className="text-slate-400 text-sm mt-1">Talking to Razorpay to confirm</p>
       </div>
     );
   }
@@ -179,6 +119,25 @@ export default function PaymentSuccess() {
     );
   }
 
+  // ── NO PAYMENT FOUND ──
+  if (state === "no-payment") {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#F7F8FC] px-6 text-center">
+        <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mb-5">
+          <AlertCircle className="w-8 h-8 text-amber-600" />
+        </div>
+        <h1 className="text-2xl font-extrabold text-slate-900 mb-2">No payment found</h1>
+        <p className="text-slate-500 max-w-sm mb-2">{errorMsg}</p>
+        <p className="text-slate-400 text-xs max-w-sm mb-6">
+          If you just paid, wait 30 seconds and refresh this page. Otherwise, please complete your ₹500 payment on leamindai.com.
+        </p>
+        <Button onClick={() => (window.location.href = "/")} className="bg-indigo-600 hover:bg-indigo-700 text-white">
+          Back to Home
+        </Button>
+      </div>
+    );
+  }
+
   // ── SUCCESS ──
   const formattedExpiry = expiryDate
     ? new Date(expiryDate).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })
@@ -187,7 +146,6 @@ export default function PaymentSuccess() {
   return (
     <div className="min-h-screen bg-[#F7F8FC] flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden">
-        {/* Header */}
         <div className="bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-600 px-6 py-10 text-center relative">
           <div className="flex items-center justify-center gap-2 mb-4">
             <img src={LOGO_URL} alt="Leamind" className="h-10 w-10 rounded-xl object-cover shadow-lg" />
@@ -202,7 +160,6 @@ export default function PaymentSuccess() {
           <p className="text-white/85 text-sm font-medium">28-day full access unlocked</p>
         </div>
 
-        {/* Body */}
         <div className="px-6 py-6">
           {formattedExpiry && (
             <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 mb-5 flex items-center gap-3">
@@ -218,7 +175,6 @@ export default function PaymentSuccess() {
             All 10 AI courses, 70+ lessons, and certificates are now unlocked. Where do you want to continue?
           </p>
 
-          {/* Continue with App */}
           <button
             onClick={handleContinueWithApp}
             className="w-full flex items-center gap-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-4 px-5 rounded-xl transition-all hover:scale-[1.01] shadow-lg shadow-indigo-200 mb-3"
@@ -234,7 +190,6 @@ export default function PaymentSuccess() {
             </div>
           </button>
 
-          {/* Continue on Site */}
           <button
             onClick={handleContinueOnSite}
             className="w-full flex items-center gap-3 bg-white border-2 border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-800 font-bold py-4 px-5 rounded-xl transition-all"
