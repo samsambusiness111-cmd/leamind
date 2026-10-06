@@ -5,7 +5,7 @@ import FreeLessonSection from "@/components/landing/FreeLessonSection";
 import { getCurrentUser } from "@/lib/auth";
 import { LOGO_URL } from "@/lib/constants";
 import EmailAuthModal from "@/components/EmailAuthModal";
-import InstructionsPopup, { shouldShowInstructions } from "@/components/InstructionsPopup";
+import InstructionsPopup from "@/components/InstructionsPopup";
 
 const TOOLS = [
   { emoji: "🤖", name: "ChatGPT", level: "Beginner", color: "from-green-500 to-emerald-600" },
@@ -136,15 +136,8 @@ export default function Landing() {
   // ── Detect if running inside the Android/iOS Capacitor app ──
   const isApp = typeof window !== "undefined" && window.Capacitor?.isNativePlatform?.() === true;
 
-  // ── On first app open, show instructions popup ──
-  useEffect(() => {
-    if (!isApp) return;
-    let mounted = true;
-    shouldShowInstructions().then((should) => {
-      if (mounted && should) setShowInstructions(true);
-    });
-    return () => { mounted = false; };
-  }, [isApp]);
+  // NOTE: Auto-popup on first launch has been removed intentionally.
+  // The InstructionsPopup now only opens when the user taps the Info icon.
 
   const handleSignUp = async () => {
     const user = await getCurrentUser();
@@ -155,7 +148,6 @@ export default function Landing() {
     }
   };
 
-  // In app: same login flow — the modal itself hides signup
   const handleLogin = handleSignUp;
 
   return (
