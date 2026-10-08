@@ -14,6 +14,9 @@ import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import MobileHeader from "@/components/MobileHeader";
 import { motion } from "framer-motion";
 
+// Detect if running inside Capacitor native app
+const isApp = typeof window !== "undefined" && window.Capacitor?.isNativePlatform?.() === true;
+
 export default function Summary() {
   const navigate = useNavigate();
   const [progress, setProgress] = useState(null);
@@ -27,7 +30,6 @@ export default function Summary() {
   const loadProgress = async () => {
     const currentUser = await getCurrentUser();
     if (!currentUser) { navigate("/"); return; }
-    // ✅ FIX: Use user.id instead of email
     const { data: userRecord, error } = await supabase
       .from("user_progress")
       .select("*")
@@ -37,6 +39,18 @@ export default function Summary() {
     const active = userRecord?.subscription_status === "active" && userRecord?.subscription_expires && new Date(userRecord.subscription_expires) > new Date();
     setIsPremium(currentUser.role === "admin" || active);
     setLoading(false);
+  };
+
+  const handlePaywallAction = (successAction) => {
+    if (isPremium) {
+      successAction();
+      return;
+    }
+    if (isApp) {
+      alert("Visit leamindai.com to subscribe, then return here and refresh.");
+      return;
+    }
+    window.open("https://rzp.io/rzp/2BWjEFKD", "_blank");
   };
 
   const [certOpen, setCertOpen] = useState(false);
@@ -58,7 +72,6 @@ export default function Summary() {
   return (
     <div className="min-h-screen bg-[#F7F8FC] pb-tab-safe md:pb-0" {...touchHandlers}>
       <MobileHeader />
-      {/* Nav */}
       <nav className="bg-white border-b border-slate-100 sticky top-0 z-40 shadow-sm">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
@@ -73,7 +86,6 @@ export default function Summary() {
           </button>
         </div>
       </nav>
-      {/* Header */}
       <div className="relative bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 text-white text-center py-16 px-4 overflow-hidden">
         <div className="absolute inset-0 opacity-10" style={{
           backgroundImage: "radial-gradient(circle at 30% 30%, white 0%, transparent 50%)"
@@ -97,7 +109,6 @@ export default function Summary() {
         </motion.div>
       </div>
 
-      {/* Module Progress Cards */}
       <div className="max-w-4xl mx-auto px-4 py-12">
         <h2 className="text-xl font-bold text-slate-800 mb-6">Module Progress</h2>
         <div className="grid md:grid-cols-2 gap-4">
@@ -130,7 +141,7 @@ export default function Summary() {
                     variant="ghost"
                     size="sm"
                     className="text-xs"
-                    onClick={() => isPremium ? navigate(createPageUrl("Course") + `?module=${mod.id}`) : window.open("https://rzp.io/rzp/2BWjEFKD", "_blank")}
+                    onClick={() => handlePaywallAction(() => navigate(createPageUrl("Course") + `?module=${mod.id}`))}
                   >
                     {pct === 100 ? "Review" : "Continue"}
                   </Button>
@@ -150,7 +161,6 @@ export default function Summary() {
           })}
         </div>
 
-        {/* Key Takeaways */}
         <div className="mt-12">
           <h2 className="text-xl font-bold text-slate-800 mb-6">Key Takeaways</h2>
           <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl border border-indigo-100 p-6 md:p-8">
@@ -174,9 +184,8 @@ export default function Summary() {
           </div>
         </div>
 
-        {/* Actions */}
         <div className="mt-12 flex flex-col sm:flex-row gap-3 justify-center">
-          <Button onClick={() => isPremium ? navigate(createPageUrl("Course")) : window.open("https://rzp.io/rzp/2BWjEFKD", "_blank")} variant="outline" size="lg" className="gap-2">
+          <Button onClick={() => handlePaywallAction(() => navigate(createPageUrl("Course")))} variant="outline" size="lg" className="gap-2">
             <RotateCcw className="w-4 h-4" /> Review Modules
           </Button>
           <Button onClick={() => navigate(createPageUrl("Home"))} size="lg" className="bg-indigo-600 hover:bg-indigo-700 gap-2">
