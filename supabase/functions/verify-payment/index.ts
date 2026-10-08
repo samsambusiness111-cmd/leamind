@@ -48,7 +48,6 @@ serve(async (req) => {
     }
 
     // ── Fetch recent payments from Razorpay ──
-    // We look for payments in the last 7 days matching this user's email
     const auth = btoa(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`);
     const fromTimestamp = Math.floor((Date.now() - 7 * 24 * 60 * 60 * 1000) / 1000);
     const paymentsUrl = `https://api.razorpay.com/v1/payments?from=${fromTimestamp}&count=100`;
@@ -97,7 +96,6 @@ serve(async (req) => {
 
     const expires = new Date(Date.now() + 28 * 24 * 60 * 60 * 1000).toISOString();
 
-    // Check if this user already has this payment applied
     const { data: existing } = await serviceClient
       .from('subscriptions')
       .select('id, razorpay_payment_id')
@@ -105,7 +103,6 @@ serve(async (req) => {
       .maybeSingle();
 
     if (existing?.razorpay_payment_id === matchingPayment.id) {
-      // Already applied — just return success
       return new Response(JSON.stringify({
         success: true,
         expiry_date: expires,

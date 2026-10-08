@@ -17,6 +17,7 @@ import SubscriptionGuard from './components/SubscriptionGuard';
 import PaymentSuccess from './pages/PaymentSuccess';
 import SuccessLeamind from './pages/SuccessLeamind';
 import Privacy from './pages/Privacy';
+import RefundPolicy from './pages/RefundPolicy';
 import DeleteAccount from './pages/DeleteAccount';
 
 import AuthGuard from './components/AuthGuard';
@@ -76,9 +77,10 @@ const AuthenticatedApp = () => {
         <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path="/success-leamind" element={<SuccessLeamind />} />
         <Route path="/privacy" element={<Privacy />} />
+        <Route path="/refund-policy" element={<RefundPolicy />} />
         <Route path="/delete-account" element={<DeleteAccount />} />
 
-        <Route path="/" element={isAuthenticated ? <Home /> : <Landing />} />
+        <Route path="/" element={isAuthenticated ? <Home />: <Landing />} />
         <Route path="/home" element={<Home />} />
         <Route path="/Home" element={<AuthGuard><Home /></AuthGuard>} />
         <Route path="/Course" element={<AuthGuard><SubscriptionGuard><Course /></SubscriptionGuard></AuthGuard>} />

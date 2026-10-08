@@ -698,6 +698,11 @@ export default function Landing() {
             <span key={t} className="text-white/25 text-sm font-medium">{t}</span>
           ))}
         </div>
+        <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mb-4 text-sm">
+          <a href="mailto:arobindan@gmail.com" className="text-white/40 hover:text-white/70 transition-colors">arobindan@gmail.com</a>
+          <a href="/privacy" className="text-white/40 hover:text-white/70 transition-colors">Privacy Policy</a>
+          <a href="/refund-policy" className="text-white/40 hover:text-white/70 transition-colors">Refund &amp; Cancellation Policy</a>
+        </div>
         <p className="text-white/15 text-sm">© {new Date().getFullYear()} LeaMind Academy. All rights reserved.</p>
       </footer>
 

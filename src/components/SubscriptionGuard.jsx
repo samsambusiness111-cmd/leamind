@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import SubscriptionModal from "./SubscriptionModal";
 import { getCurrentUser, checkSubscription } from "@/lib/auth";
 
+// Detect if running inside Capacitor native app
+const isApp = typeof window !== "undefined" && window.Capacitor?.isNativePlatform?.() === true;
+
 export default function SubscriptionGuard({ children }) {
   const [status, setStatus] = useState("loading");
 
