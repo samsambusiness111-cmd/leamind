@@ -1,9 +1,13 @@
 import React, { useState } from "react";
-import { ChevronDown, ChevronRight, ArrowRight, Volume2 } from "lucide-react";
+import { ChevronDown, ChevronRight, ArrowRight, Volume2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import SectionBlock from "./SectionBlock";
 import QuizBlock from "./QuizBlock";
+import { TextToSpeech } from "@capacitor-community/text-to-speech";
+
+// Detect if running inside Capacitor native app
+const isApp = typeof window !== "undefined" && window.Capacitor?.isNativePlatform?.() === true;
 
 export default function LessonView({ lesson, lessonIndex, totalLessons, onNext, onComplete }) {
   const [expandedSections, setExpandedSections] = useState(
@@ -11,6 +15,7 @@ export default function LessonView({ lesson, lessonIndex, totalLessons, onNext, 
   );
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [listenMode, setListenMode] = useState(false);
+  const [ttsLoading, setTtsLoading] = useState(false);
 
   const toggleSection = (idx) => {
     setExpandedSections(prev => ({ ...prev, [idx]: !prev[idx] }));
@@ -40,7 +45,55 @@ export default function LessonView({ lesson, lessonIndex, totalLessons, onNext, 
            null;
   };
 
-  const handleListen = () => {
+  // ── Native app TTS (uses Android native Text-to-Speech) ──
+  const handleListenApp = async () => {
+    if (listenMode) {
+      try {
+        await TextToSpeech.stop();
+      } catch (err) {
+        console.error("TTS stop error:", err);
+      }
+      setListenMode(false);
+      return;
+    }
+
+    setTtsLoading(true);
+    try {
+      const text = lesson.sections
+        .map(s => s.title + ". " + s.content)
+        .join(". ")
+        .replace(/\*\*/g, '')
+        .replace(/\n/g, ' ');
+
+      // Check if TTS is available
+      const { supported } = await TextToSpeech.isLanguageSupported({ language: "en-US" });
+      if (!supported) {
+        alert("Text-to-speech is not available on this device. Please install a TTS engine from Play Store.");
+        setTtsLoading(false);
+        return;
+      }
+
+      setListenMode(true);
+      setTtsLoading(false);
+
+      await TextToSpeech.speak({
+        text,
+        lang: "en-US",
+        rate: 0.9,
+        pitch: 1.0,
+        volume: 1.0,
+        category: "ambient",
+      });
+    } catch (err) {
+      console.error("TTS speak error:", err);
+      setListenMode(false);
+      setTtsLoading(false);
+      alert("Audio playback failed. Try again or check your device's text-to-speech settings.");
+    }
+  };
+
+  // ── Website TTS (uses Web Speech API) ──
+  const handleListenWeb = () => {
     if (!listenMode && 'speechSynthesis' in window) {
       speechSynthesis.cancel();
       const text = lesson.sections.map(s => s.title + ". " + s.content).join(". ");
@@ -52,6 +105,7 @@ export default function LessonView({ lesson, lessonIndex, totalLessons, onNext, 
         const voice = getBestVoice();
         if (voice) utterance.voice = voice;
         utterance.onend = () => setListenMode(false);
+        utterance.onerror = () => setListenMode(false);
         speechSynthesis.speak(utterance);
       };
       if (speechSynthesis.getVoices().length > 0) {
@@ -65,6 +119,19 @@ export default function LessonView({ lesson, lessonIndex, totalLessons, onNext, 
       setListenMode(false);
     }
   };
+
+  const handleListen = isApp ? handleListenApp : handleListenWeb;
+
+  // Clean up TTS on unmount (app only)
+  React.useEffect(() => {
+    return () => {
+      if (isApp) {
+        TextToSpeech.stop().catch(() => {});
+      } else if ('speechSynthesis' in window) {
+        speechSynthesis.cancel();
+      }
+    };
+  }, []);
 
   return (
     <div>
@@ -80,10 +147,15 @@ export default function LessonView({ lesson, lessonIndex, totalLessons, onNext, 
             variant={listenMode ? "default" : "outline"}
             size="sm"
             onClick={handleListen}
+            disabled={ttsLoading}
             className={`gap-1.5 text-xs ${listenMode ? "bg-indigo-600" : ""}`}
           >
-            <Volume2 className="w-3.5 h-3.5" />
-            {listenMode ? "Stop" : "Listen"}
+            {ttsLoading ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <Volume2 className="w-3.5 h-3.5" />
+            )}
+            {ttsLoading ? "Loading..." : listenMode ? "Stop" : "Listen"}
           </Button>
         </div>
       </div>
