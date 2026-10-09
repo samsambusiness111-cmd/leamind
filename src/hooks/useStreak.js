@@ -1,18 +1,35 @@
-// Streak utility: call on every app load to update streak
-export function computeStreak(progress) {
-  if (!progress) return { streakCount: 0, longestStreak: 0, type: null };
+// Streak utility — call on every app load for PREMIUM users only
+// Uses LOCAL timezone (not UTC) to avoid off-by-one-day bugs in India (UTC+5:30)
 
-  const today = new Date().toISOString().slice(0, 10);
+function getLocalDate(offsetDays = 0) {
+  const d = new Date();
+  d.setDate(d.getDate() + offsetDays);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+export function computeStreak(progress) {
+  if (!progress) {
+    return { streakCount: 0, longestStreak: 0, type: null, shouldUpdate: false };
+  }
+
+  const today = getLocalDate(0);
+  const yesterday = getLocalDate(-1);
   const lastLogin = progress.last_login_date;
   const currentStreak = progress.streak_count || 0;
   const longestStreak = progress.longest_streak || 0;
 
+  // Already logged in today — no update needed
   if (lastLogin === today) {
-    // Already logged in today
-    return { streakCount: currentStreak, longestStreak, type: null, shouldUpdate: false };
+    return {
+      streakCount: currentStreak,
+      longestStreak,
+      type: null,
+      shouldUpdate: false,
+    };
   }
-
-  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
 
   let newStreak;
   let type;

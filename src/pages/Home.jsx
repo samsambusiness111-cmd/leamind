@@ -51,27 +51,35 @@ export default function Home() {
       }
 
       if (prog) {
-        const streakResult = computeStreak(prog);
-        if (streakResult.shouldUpdate) {
-          const updated = {
-            streak_count: streakResult.streakCount,
-            longest_streak: streakResult.longestStreak,
-            last_login_date: streakResult.last_login_date,
-          };
-          const { error: updateError } = await supabase
-            .from("user_progress")
-            .update(updated)
-            .eq("id", prog.id);
+        const isPremiumUser = sub.subscribed === true;
 
-          if (!updateError) {
-            setProgress({ ...prog, ...updated });
-          }
-
-          if (streakResult.type && streakResult.type !== "continue") {
-            setStreakModal({ open: true, type: streakResult.type, streak: streakResult.streakCount });
-          }
-        } else {
+        // Only compute/update streak for premium users
+        if (!isPremiumUser) {
+          // Free user — don't touch streak data
           setProgress(prog);
+        } else {
+          const streakResult = computeStreak(prog);
+          if (streakResult.shouldUpdate) {
+            const updated = {
+              streak_count: streakResult.streakCount,
+              longest_streak: streakResult.longestStreak,
+              last_login_date: streakResult.last_login_date,
+            };
+            const { error: updateError } = await supabase
+              .from("user_progress")
+              .update(updated)
+              .eq("id", prog.id);
+
+            if (!updateError) {
+              setProgress({ ...prog, ...updated });
+            }
+
+            if (streakResult.type && streakResult.type !== "continue") {
+              setStreakModal({ open: true, type: streakResult.type, streak: streakResult.streakCount });
+            }
+          } else {
+            setProgress(prog);
+          }
         }
       }
     } catch (error) {
@@ -154,7 +162,7 @@ export default function Home() {
             <button onClick={() => document.getElementById('faq')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-slate-800 transition-colors">FAQ</button>
           </div>
           <div className="flex items-center gap-2">
-            {streak > 0 && (
+            {isPremium && streak > 0 && (
               <div className="hidden sm:flex items-center gap-1 bg-orange-50 border border-orange-100 rounded-full px-3 py-1.5 text-xs font-bold text-orange-600">
                 <Flame className="w-3.5 h-3.5" /> {streak} day streak
               </div>
@@ -173,19 +181,16 @@ export default function Home() {
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 space-y-12">
 
-        {/* PAYWALL BANNER — BUTTON ON WEBSITE, TEXT ONLY IN APP */}
         {!isPremium && (
           <div className="bg-[#1A365D] rounded-2xl p-6 text-white text-center border-2 border-yellow-400">
             <div className="text-3xl mb-2">🔒</div>
             <h2 className="text-xl font-black mb-2">Premium access required</h2>
 
             {isApp ? (
-              // IN APP: text only, no button (Google-compliant)
               <p className="text-white/80 text-sm">
                 Go to leamindai.com to upgrade and unlock 28-day access.
               </p>
             ) : (
-              // ON WEBSITE: show the pay button
               <>
                 <p className="text-white/80 text-sm mb-4">
                   Unlock 28-day access to all 10 AI courses for ₹500 (one-time).
@@ -227,9 +232,9 @@ export default function Home() {
                     ? `Pick up where you left off. ${currentModuleDone} of ${currentModule.lessons.length} lessons completed.`
                     : "10 industry-leading AI tools. Step-by-step lessons. Professional certificates."}
                 </p>
-                {streak > 0 && (
+                {isPremium && streak > 0 && (
                   <div className="flex items-center gap-1.5 mb-4 text-sm text-orange-600 font-semibold">
-                    <Flame className="w-4 h-4" /> {streak} day streak — keep it going!
+                    <Flame className="w-4 h-4" /> {streak === 1 ? "Streak started — come back tomorrow!" : `${streak} day streak — keep it going!`}
                   </div>
                 )}
                 <div className="flex flex-wrap gap-3">
