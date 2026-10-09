@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, CheckCircle2, XCircle } from "lucide-react";
+import { ChevronLeft, ChevronRight, CheckCircle2 } from "lucide-react";
 
-// ─── JASPER AI FULL LESSON ───────────────────────────────────────────────────
-// Structure: sections that scroll through — overview, interface, features,
-// use-cases, tips, exercises, then prompts at the very end.
+// ─── JASPER AI HYPER-DETAILED LESSON ─────────────────────────────────────────
+// 10 in-depth sections: What, Interface, Templates, How to Use, Advanced Workflows,
+// Prompt Engineering, Common Mistakes, Real Use Cases, Quiz, Prompts
 
 const SECTIONS = [
   {
@@ -61,10 +61,7 @@ const SECTIONS = [
         type: "intro",
         text: "When you first open Jasper, the interface can feel overwhelming. There are multiple modes, sidebars, and settings. This section breaks down every part of the Jasper dashboard so you know exactly what each button does.",
       },
-      {
-        type: "section-header",
-        text: "📌 The 3 Main Modes",
-      },
+      { type: "section-header", text: "📌 The 3 Main Modes" },
       {
         type: "feature",
         name: "1. Documents Mode (Long-Form Editor)",
@@ -80,10 +77,7 @@ const SECTIONS = [
         name: "3. Chat Mode (Jasper Chat)",
         detail: "A conversational AI assistant — similar to ChatGPT but with Jasper's marketing DNA. You talk to it like a colleague. Ask it to 'write', 'rewrite', 'brainstorm', 'make shorter', or 'make this more persuasive'. Best for: quick tasks, back-and-forth refinement.",
       },
-      {
-        type: "section-header",
-        text: "📌 The Sidebar — Key Settings",
-      },
+      { type: "section-header", text: "📌 The Sidebar — Key Settings" },
       {
         type: "feature",
         name: "Output Language",
@@ -183,46 +177,31 @@ const SECTIONS = [
         type: "intro",
         text: "Jasper is only as good as your input. Most people who call Jasper 'bad' are using it wrong — they give it vague instructions and expect magic. Here's how to use it the right way.",
       },
-      {
-        type: "section-header",
-        text: "🎯 Step 1: Always Set Context First",
-      },
+      { type: "section-header", text: "🎯 Step 1: Always Set Context First" },
       {
         type: "info",
         label: "The Product Description Box",
         text: "Before you use any template or write in Documents mode, fill in the 'Product/Company Description' box on the right sidebar. Tell Jasper: what your product is, who it's for, and what makes it different. This is the single most important thing you can do. Without context, Jasper writes generic content. With context, it writes content that feels like it knows your business.",
       },
-      {
-        type: "section-header",
-        text: "🎯 Step 2: Choose the Right Tone",
-      },
+      { type: "section-header", text: "🎯 Step 2: Choose the Right Tone" },
       {
         type: "info",
         label: "Tone = Voice",
         text: "Before generating, always select a tone of voice. For a startup pitch: 'Professional + Confident'. For social media: 'Casual + Witty'. For a sales email: 'Persuasive + Empathetic'. Switching the tone alone gives you dramatically different results from the same prompt.",
       },
-      {
-        type: "section-header",
-        text: "🎯 Step 3: Use Commands in Documents Mode",
-      },
+      { type: "section-header", text: "🎯 Step 3: Use Commands in Documents Mode" },
       {
         type: "feature",
         name: "Boss Mode Commands",
         detail: "In Documents mode, you can give Jasper direct commands. Type them in the command box (or use the shortcut Cmd/Ctrl + Enter). Examples: 'Write a 3-paragraph introduction about [topic]', 'List 5 reasons why [product] is better than competitors', 'Rewrite the above paragraph in a more casual tone', 'Write a conclusion that includes a call to action'.",
       },
-      {
-        type: "section-header",
-        text: "🎯 Step 4: Use Recipes (Workflows)",
-      },
+      { type: "section-header", text: "🎯 Step 4: Use Recipes (Workflows)" },
       {
         type: "info",
         label: "Recipes",
         text: "Jasper has 'Recipes' — pre-built sequences of commands that produce a full piece of content automatically. For example, the 'Blog Post Recipe' runs a sequence: write title → write intro → write 5 sections → write conclusion → write meta description. One click. Full post done.",
       },
-      {
-        type: "section-header",
-        text: "🎯 Step 5: Always Edit, Never Just Publish",
-      },
+      { type: "section-header", text: "🎯 Step 5: Always Edit, Never Just Publish" },
       {
         type: "fact",
         text: "Jasper's output is a first draft — a powerful one, but still a draft. The best workflow: Jasper writes 80% of the content, you refine the remaining 20% with your personal insight, specific data, and brand personality. This combination produces content that is both fast and genuinely good.",
@@ -237,6 +216,168 @@ const SECTIONS = [
           "Use 'Content Improver' on your own writing to polish it instantly",
           "Save your best outputs as Templates for reuse later",
         ],
+      },
+    ],
+  },
+  {
+    id: "advanced",
+    tab: "Advanced Workflows",
+    emoji: "🚀",
+    title: "Advanced Workflows — How Pros Use Jasper",
+    level: "Advanced",
+    content: [
+      {
+        type: "intro",
+        text: "Once you've mastered the basics, the real power comes from combining Jasper with other tools and building repeatable workflows. Here are the workflows top marketers and content teams actually use.",
+      },
+      {
+        type: "feature",
+        name: "Workflow 1: The Content Machine (Jasper + Surfer SEO + Grammarly)",
+        detail: "Step 1: Use Surfer SEO to research the keyword and get a content brief. Step 2: Feed the brief into Jasper's 'Blog Post' recipe to generate the full draft. Step 3: Run the draft through Grammarly for grammar polish. Step 4: Add your personal insights and specific data. Result: A rank-ready SEO blog post in 25 minutes instead of 4 hours.",
+      },
+      {
+        type: "feature",
+        name: "Workflow 2: The Ad Testing Loop (Jasper + Google Ads + Analytics)",
+        detail: "Step 1: Generate 20 ad variations with Jasper's Google Ads template. Step 2: Launch all 20 in Google Ads as A/B tests. Step 3: After 3 days, kill the bottom 15, keep the top 5. Step 4: Feed the winning copy back into Jasper as context and generate 20 more variations of the winners. Step 5: Repeat weekly. Result: Ad performance improves continuously.",
+      },
+      {
+        type: "feature",
+        name: "Workflow 3: The Social Media Calendar (Jasper + Notion + Buffer)",
+        detail: "Step 1: Ask Jasper Chat to generate 30 days of Instagram captions with hooks and hashtags. Step 2: Paste them into a Notion database. Step 3: Schedule them through Buffer. Step 4: Spend 15 minutes customizing the top 5 posts for higher engagement. Result: A full month of content in under 30 minutes.",
+      },
+      {
+        type: "feature",
+        name: "Workflow 4: The Email Sequence Builder (Jasper + ConvertKit)",
+        detail: "Step 1: Ask Jasper Chat to write a 5-email welcome sequence for a specific audience. Step 2: Have Jasper write subject lines for each email. Step 3: Import to ConvertKit. Step 4: Test subject lines via split-test. Result: A complete email funnel built in one sitting.",
+      },
+      {
+        type: "feature",
+        name: "Workflow 5: The Product Launch Kit (Jasper + ChatGPT + Canva)",
+        detail: "Step 1: Use ChatGPT for strategy and positioning. Step 2: Use Jasper for all the copy — landing page, emails, ads, social posts. Step 3: Use Canva for visuals. Step 4: Assemble everything into a launch kit. Result: A complete product launch in days, not weeks.",
+      },
+      {
+        type: "fact",
+        text: "The pattern across all workflows: Jasper is the writing engine, other tools handle research, distribution, and design. Jasper works best when it's one node in a bigger system.",
+      },
+    ],
+  },
+  {
+    id: "prompt-eng",
+    tab: "Prompt Engineering",
+    emoji: "🎯",
+    title: "Prompt Engineering for Jasper — Writing Prompts That Work",
+    level: "Intermediate",
+    content: [
+      {
+        type: "intro",
+        text: "The single biggest difference between mediocre Jasper output and excellent Jasper output is prompt quality. Here's the exact framework top users apply.",
+      },
+      { type: "section-header", text: "📐 The 5-Part Prompt Framework" },
+      {
+        type: "feature",
+        name: "Part 1: Role — Who is Jasper pretending to be?",
+        detail: "Start every prompt by giving Jasper a role. 'You are a senior marketing copywriter who has written for Apple and Nike.' This single line dramatically changes the quality and tone of the output. Without a role, Jasper defaults to generic assistant mode. With a role, it writes like the persona you specified.",
+      },
+      {
+        type: "feature",
+        name: "Part 2: Task — What specifically do you want?",
+        detail: "Be painfully specific. Not: 'write an ad'. But: 'write 3 Facebook ad variations for a ₹499 productivity course targeting Indian college students, each under 100 words, focused on saving time and getting ahead in studies.' The more specific the task, the better the output.",
+      },
+      {
+        type: "feature",
+        name: "Part 3: Context — What does Jasper need to know?",
+        detail: "Give Jasper the information a human writer would need: what the product does, who the audience is, what problem it solves, what makes it different, what competitors exist. The more context, the more relevant the output.",
+      },
+      {
+        type: "feature",
+        name: "Part 4: Format — How should the output look?",
+        detail: "Tell Jasper the structure you want. 'Format: headline + 3 bullets + 1 CTA line. Use short sentences. Max 8 words per sentence. Include a number in the headline.' Without format instructions, Jasper guesses — and often gets it wrong.",
+      },
+      {
+        type: "feature",
+        name: "Part 5: Constraints — What should Jasper avoid?",
+        detail: "Tell Jasper what NOT to do. 'Avoid clichés like “revolutionary” or “game-changer”. No exclamation marks. Don't use the word “unlock”. Keep it under 150 words.' Negative instructions often improve output more than positive ones.",
+      },
+      { type: "section-header", text: "🔧 Advanced Prompt Techniques" },
+      {
+        type: "feature",
+        name: "Few-Shot Examples",
+        detail: "Give Jasper 2–3 examples of the style you want. 'Here are 3 examples of ad copy I love: [example 1], [example 2], [example 3]. Write me 5 more in this exact style.' This is the single most effective technique for matching a specific voice — it's called 'few-shot prompting' and works extremely well.",
+      },
+      {
+        type: "feature",
+        name: "Chain of Thought",
+        detail: "Ask Jasper to think step-by-step. 'Before writing, first outline 5 angles I could take. Then pick the best one and explain why. Then write the ad based on that angle.' This produces dramatically better output because Jasper plans before writing.",
+      },
+      {
+        type: "feature",
+        name: "Iterative Refinement",
+        detail: "Don't accept the first output. Reply with: 'This is good, but make it more X'. 'Rewrite the second paragraph to be more Y.' 'Make the headline shorter and punchier.' 3–4 iterations usually gets you from 'decent' to 'excellent'.",
+      },
+      {
+        type: "list",
+        label: "Quick Prompt Improvement Checklist",
+        items: [
+          "Did I give Jasper a role?",
+          "Is the task specific, not vague?",
+          "Did I provide all the context a human writer would need?",
+          "Did I specify the exact format I want?",
+          "Did I list constraints (what NOT to do)?",
+          "Did I give 1–3 examples of style?",
+          "Am I willing to iterate 3–4 times?",
+        ],
+      },
+    ],
+  },
+  {
+    id: "mistakes",
+    tab: "Common Mistakes",
+    emoji: "⚠️",
+    title: "Common Mistakes Beginners Make (And How to Avoid Them)",
+    level: "Beginner",
+    content: [
+      {
+        type: "intro",
+        text: "Most people who try Jasper and give up make one of these 7 mistakes. Avoiding them is the fastest way to get dramatically better results.",
+      },
+      {
+        type: "feature",
+        name: "Mistake 1: Vague Prompts",
+        detail: "'Write me a blog post' → generic, useless output. 'Write a 1,200-word blog post on the topic “how to reduce food waste at home” for a US audience aged 25–40, tone: friendly and practical, with 5 subheadings and a call to action at the end' → usable output. The specificity of your prompt directly determines the quality of the output.",
+      },
+      {
+        type: "feature",
+        name: "Mistake 2: Not Setting Tone",
+        detail: "The default tone Jasper uses is neutral — which is fine but rarely great. Setting the tone to 'Confident + Warm' or 'Bold + Direct' changes output quality significantly. Always pick a tone before generating.",
+      },
+      {
+        type: "feature",
+        name: "Mistake 3: Publishing Without Editing",
+        detail: "AI content published raw has a recognizable 'AI voice' — slightly generic, slightly off, missing specific details. Add your own data, examples, personality, and edge cases. Your editing is what turns 'AI-written' into 'actually good'.",
+      },
+      {
+        type: "feature",
+        name: "Mistake 4: Expecting One-Shot Perfection",
+        detail: "First output is a starting point, not a finished product. The pros iterate 3–5 times. Each iteration refines one aspect — make it shorter, more emotional, less formal, add a statistic. Iteration is the work.",
+      },
+      {
+        type: "feature",
+        name: "Mistake 5: Ignoring the Product Description Box",
+        detail: "This is the biggest one. If Jasper doesn't know what your product is, who it's for, and what makes it different — it writes generic content. Fill in the product description box for every project. It's the difference between generic and specific.",
+      },
+      {
+        type: "feature",
+        name: "Mistake 6: Using Templates for Everything",
+        detail: "Templates are great for short outputs (ads, subject lines, product descriptions). For long-form content (blog posts, articles), use Documents Mode instead. Templates cut off at short lengths and produce fragmented output for long content.",
+      },
+      {
+        type: "feature",
+        name: "Mistake 7: Not Fact-Checking",
+        detail: "Jasper can hallucinate statistics, quotes, and specific facts. Always verify any statistic, date, or factual claim before publishing. Use Jasper for language and structure, not for facts.",
+      },
+      {
+        type: "fact",
+        text: "The single biggest jump in quality comes from fixing Mistake 1 (vague prompts) and Mistake 5 (missing context). Do those two and you're already in the top 20% of Jasper users.",
       },
     ],
   },
@@ -330,6 +471,18 @@ const SECTIONS = [
         correct: 3,
         explanation: "Jasper is your first draft machine. It handles 80% of the heavy lifting. Your job is to add the final 20% — your personal expertise, specific statistics, real-world examples, and your brand's unique voice. This combination produces the best results.",
       },
+      {
+        q: "What is the single biggest mistake beginners make with Jasper?",
+        options: ["Using too many templates", "Writing vague prompts without context", "Not using Jasper Art", "Choosing the wrong tone"],
+        correct: 1,
+        explanation: "Vague prompts without context produce generic output. The two biggest quality jumps come from (1) writing specific prompts and (2) filling in the Product Description box with real context. Do those two and you're already in the top 20% of users.",
+      },
+      {
+        q: "In the 5-Part Prompt Framework, what does 'Role' mean?",
+        options: ["The job title you want in the output", "Giving Jasper a persona to write as (e.g., 'senior copywriter for Apple')", "The type of content you're creating", "The tone you want Jasper to use"],
+        correct: 1,
+        explanation: "Role = telling Jasper who it's pretending to be. 'You are a senior marketing copywriter who has written for Apple and Nike.' This single line dramatically changes the quality and voice of the output. Without a role, Jasper defaults to generic assistant mode.",
+      },
     ],
   },
   {
@@ -422,10 +575,10 @@ function QuizSection({ questions }) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <p className="text-white/40 text-sm">Answer each question, then click Check to see if you're right.</p>
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <p className="text-slate-400 text-sm">Answer each question, then click Check to see if you're right.</p>
         {Object.keys(submitted).length === questions.length && (
-          <span className={`text-sm font-black px-3 py-1 rounded-full ${score === questions.length ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" : "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30"}`}>
+          <span className={`text-sm font-black px-3 py-1 rounded-full ${score === questions.length ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30" : "bg-blue-500/20 text-blue-300 border border-blue-500/30"}`}>
             {score}/{questions.length} correct
           </span>
         )}
@@ -440,14 +593,14 @@ function QuizSection({ questions }) {
           <div key={qi} className="border border-white/8 rounded-xl overflow-hidden">
             <div className="p-4 border-b border-white/5" style={{ background: "rgba(255,255,255,0.02)" }}>
               <p className="text-white/80 text-sm font-semibold leading-relaxed">
-                <span className="text-indigo-400 font-black mr-2">Q{qi + 1}.</span>{q.q}
+                <span className="text-blue-400 font-black mr-2">Q{qi + 1}.</span>{q.q}
               </p>
             </div>
             <div className="p-4 space-y-2">
               {q.options.map((opt, oi) => {
                 let style = "border-white/8 text-white/50 hover:border-white/20 hover:text-white/70";
                 if (selected === oi) {
-                  if (!isSubmitted) style = "border-indigo-400/60 text-white bg-indigo-500/10";
+                  if (!isSubmitted) style = "border-blue-400/60 text-white bg-blue-500/10";
                   else if (isCorrect) style = "border-emerald-400/60 text-emerald-300 bg-emerald-500/10";
                   else style = "border-red-400/60 text-red-300 bg-red-500/10";
                 }
@@ -470,15 +623,15 @@ function QuizSection({ questions }) {
                 <button
                   onClick={() => handleCheck(qi)}
                   disabled={selected === undefined}
-                  className="mt-2 px-5 py-2 rounded-xl text-sm font-black text-black disabled:opacity-30 transition-all"
-                  style={{ background: "linear-gradient(135deg, #34d399, #10b981)" }}
+                  className="mt-2 px-5 py-2 rounded-xl text-sm font-black text-white disabled:opacity-30 transition-all"
+                  style={{ background: "linear-gradient(135deg, #2563EB, #1E40AF)" }}
                 >
                   Check Answer
                 </button>
               ) : (
                 <div className={`mt-2 p-3 rounded-xl border text-sm ${isCorrect ? "border-emerald-500/25 bg-emerald-500/8 text-emerald-300/80" : "border-red-500/25 bg-red-500/8 text-red-300/80"}`}>
                   <p className="font-bold mb-1">{isCorrect ? "✅ Correct!" : "❌ Not quite."}</p>
-                  <p className="leading-relaxed text-white/50">{q.explanation}</p>
+                  <p className="leading-relaxed text-white/60">{q.explanation}</p>
                 </div>
               )}
             </div>
@@ -497,34 +650,34 @@ function SectionContent({ section }) {
     <div className="space-y-5">
       {section.content.map((block, i) => {
         if (block.type === "intro") return (
-          <p key={i} className="text-white/60 text-sm leading-relaxed">{block.text}</p>
+          <p key={i} className="text-slate-300 text-sm leading-relaxed">{block.text}</p>
         );
 
         if (block.type === "section-header") return (
-          <p key={i} className="text-white/70 font-black text-sm pt-2">{block.text}</p>
+          <p key={i} className="text-blue-200 font-black text-sm pt-2">{block.text}</p>
         );
 
         if (block.type === "info") return (
-          <div key={i} className="border border-indigo-500/20 rounded-xl p-4" style={{ background: "rgba(99,102,241,0.04)" }}>
-            <p className="text-indigo-300/80 text-[10px] font-black uppercase tracking-[3px] mb-2">{block.label}</p>
-            <p className="text-white/60 text-sm leading-relaxed">{block.text}</p>
+          <div key={i} className="border border-blue-400/25 rounded-xl p-4" style={{ background: "rgba(37,99,235,0.08)" }}>
+            <p className="text-blue-300 text-[10px] font-black uppercase tracking-[3px] mb-2">{block.label}</p>
+            <p className="text-slate-300 text-sm leading-relaxed">{block.text}</p>
           </div>
         );
 
         if (block.type === "fact") return (
-          <div key={i} className="border border-yellow-500/20 rounded-xl p-4" style={{ background: "rgba(212,160,23,0.04)" }}>
-            <p className="text-yellow-400/70 text-[10px] font-black uppercase tracking-[3px] mb-2">💡 Key Insight</p>
-            <p className="text-white/65 text-sm leading-relaxed italic">{block.text}</p>
+          <div key={i} className="border border-blue-300/25 rounded-xl p-4" style={{ background: "rgba(37,99,235,0.06)" }}>
+            <p className="text-blue-200 text-[10px] font-black uppercase tracking-[3px] mb-2">💡 Key Insight</p>
+            <p className="text-slate-300 text-sm leading-relaxed italic">{block.text}</p>
           </div>
         );
 
         if (block.type === "list") return (
-          <div key={i} className="border border-white/6 rounded-xl p-4" style={{ background: "rgba(255,255,255,0.02)" }}>
-            <p className="text-white/40 text-[10px] font-black uppercase tracking-[3px] mb-3">{block.label}</p>
+          <div key={i} className="border border-white/8 rounded-xl p-4" style={{ background: "rgba(255,255,255,0.02)" }}>
+            <p className="text-slate-400 text-[10px] font-black uppercase tracking-[3px] mb-3">{block.label}</p>
             <ul className="space-y-2">
               {block.items.map((item, ii) => (
-                <li key={ii} className="flex items-start gap-2.5 text-sm text-white/60">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
+                <li key={ii} className="flex items-start gap-2.5 text-sm text-slate-300">
+                  <CheckCircle2 className="w-4 h-4 text-blue-400 mt-0.5 shrink-0" />
                   {item}
                 </li>
               ))}
@@ -533,39 +686,39 @@ function SectionContent({ section }) {
         );
 
         if (block.type === "feature") return (
-          <div key={i} className="border border-white/6 rounded-xl p-4 hover:border-white/12 transition-colors" style={{ background: "rgba(255,255,255,0.02)" }}>
-            <p className="text-white/80 font-bold text-sm mb-2">{block.name}</p>
-            <p className="text-white/50 text-sm leading-relaxed">{block.detail}</p>
+          <div key={i} className="border border-white/8 rounded-xl p-4 hover:border-blue-400/30 transition-colors" style={{ background: "rgba(255,255,255,0.02)" }}>
+            <p className="text-white font-bold text-sm mb-2">{block.name}</p>
+            <p className="text-slate-300 text-sm leading-relaxed">{block.detail}</p>
           </div>
         );
 
         if (block.type === "template") return (
-          <div key={i} className="border border-white/6 rounded-xl p-4 hover:border-indigo-500/20 transition-colors" style={{ background: "rgba(255,255,255,0.02)" }}>
+          <div key={i} className="border border-white/8 rounded-xl p-4 hover:border-blue-400/30 transition-colors" style={{ background: "rgba(255,255,255,0.02)" }}>
             <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
-              <p className="text-white/80 font-bold text-sm">{block.name}</p>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">{block.tag}</span>
+              <p className="text-white font-bold text-sm">{block.name}</p>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-300 border border-blue-500/25">{block.tag}</span>
             </div>
-            <p className="text-white/50 text-sm leading-relaxed">{block.detail}</p>
+            <p className="text-slate-300 text-sm leading-relaxed">{block.detail}</p>
           </div>
         );
 
         if (block.type === "usecase") return (
-          <div key={i} className="border border-white/6 rounded-xl overflow-hidden" style={{ background: "rgba(255,255,255,0.02)" }}>
-            <div className="px-4 py-3 border-b border-white/5" style={{ background: "rgba(99,102,241,0.06)" }}>
-              <p className="text-indigo-300 font-black text-sm">{block.who}</p>
+          <div key={i} className="border border-white/8 rounded-xl overflow-hidden" style={{ background: "rgba(255,255,255,0.02)" }}>
+            <div className="px-4 py-3 border-b border-white/5" style={{ background: "rgba(37,99,235,0.1)" }}>
+              <p className="text-blue-200 font-black text-sm">{block.who}</p>
             </div>
             <div className="p-4 space-y-2 text-sm">
               <div className="flex items-start gap-2">
                 <span className="text-red-400 font-bold text-xs shrink-0 mt-0.5">BEFORE:</span>
-                <p className="text-white/45 leading-relaxed">{block.before}</p>
+                <p className="text-slate-400 leading-relaxed">{block.before}</p>
               </div>
               <div className="flex items-start gap-2">
-                <span className="text-emerald-400 font-bold text-xs shrink-0 mt-0.5">AFTER:</span>
-                <p className="text-white/65 leading-relaxed">{block.after}</p>
+                <span className="text-blue-300 font-bold text-xs shrink-0 mt-0.5">AFTER:</span>
+                <p className="text-slate-200 leading-relaxed">{block.after}</p>
               </div>
-              <div className="flex items-start gap-2 pt-1 border-t border-white/5 mt-2">
-                <span className="text-yellow-400 font-bold text-xs shrink-0 mt-0.5">RESULT:</span>
-                <p className="text-yellow-300/70 leading-relaxed font-semibold">{block.result}</p>
+              <div className="flex items-start gap-2 pt-2 border-t border-white/5 mt-2">
+                <span className="text-blue-200 font-bold text-xs shrink-0 mt-0.5">RESULT:</span>
+                <p className="text-blue-100/90 leading-relaxed font-semibold">{block.result}</p>
               </div>
             </div>
           </div>
@@ -573,17 +726,17 @@ function SectionContent({ section }) {
 
         if (block.type === "prompt-group") return (
           <div key={i} className="space-y-3">
-            <p className="text-[10px] font-black tracking-[3px] text-white/30 uppercase pt-2">{block.label}</p>
+            <p className="text-[10px] font-black tracking-[3px] text-slate-400 uppercase pt-2">{block.label}</p>
             {block.prompts.map((p, pi) => (
-              <div key={pi} className="rounded-xl border border-indigo-500/20 overflow-hidden" style={{ background: "rgba(10,10,30,0.8)" }}>
-                <div className="flex items-center gap-2 px-4 py-2 border-b border-white/5" style={{ background: "rgba(99,102,241,0.08)" }}>
+              <div key={pi} className="rounded-xl border border-blue-400/25 overflow-hidden" style={{ background: "rgba(10,20,45,0.8)" }}>
+                <div className="flex items-center gap-2 px-4 py-2 border-b border-white/5" style={{ background: "rgba(37,99,235,0.12)" }}>
                   <div className="w-2 h-2 rounded-full bg-red-400/50" />
                   <div className="w-2 h-2 rounded-full bg-yellow-400/50" />
                   <div className="w-2 h-2 rounded-full bg-green-400/50" />
-                  <span className="text-white/30 text-[10px] ml-2 font-mono">{p.title}</span>
+                  <span className="text-slate-400 text-[10px] ml-2 font-mono">{p.title}</span>
                 </div>
                 <div className="p-4">
-                  <pre className="text-indigo-200 text-xs leading-relaxed font-mono whitespace-pre-wrap">{p.text}</pre>
+                  <pre className="text-blue-100 text-xs leading-relaxed font-mono whitespace-pre-wrap">{p.text}</pre>
                 </div>
               </div>
             ))}
@@ -596,30 +749,50 @@ function SectionContent({ section }) {
   );
 }
 
+// ─── Jasper Logo (inline SVG) ────────────────────────────────────────────────
+function JasperLogo({ className = "w-10 h-10" }) {
+  return (
+    <svg className={className} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="48" height="48" rx="12" fill="url(#jasperGradient)" />
+      <path d="M18 14h12v18a6 6 0 0 1-6 6h-3a4 4 0 0 1-4-4v-2h4v1.5c0 .5.4.5.8.5h2.2c1 0 1.5-.5 1.5-1.5V18H18v-4Z" fill="white"/>
+      <circle cx="35" cy="15" r="3" fill="#60A5FA"/>
+      <defs>
+        <linearGradient id="jasperGradient" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#2563EB"/>
+          <stop offset="1" stopColor="#1E40AF"/>
+        </linearGradient>
+      </defs>
+    </svg>
+  );
+}
+
 // ─── Main Component ──────────────────────────────────────────────────────────
 export default function FreeLessonSection({ onSignUp }) {
   const [activeSection, setActiveSection] = useState(0);
   const section = SECTIONS[activeSection];
 
   return (
-    <section className="py-12 sm:py-20 px-4 border-t border-white/5 relative" style={{ background: "#030308" }}>
+    <section className="py-12 sm:py-20 px-4 relative" style={{ background: "linear-gradient(180deg, #0C1E3E 0%, #0A1830 100%)" }}>
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[400px] pointer-events-none"
-        style={{ background: "radial-gradient(ellipse, rgba(99,102,241,0.08) 0%, transparent 65%)" }} />
+        style={{ background: "radial-gradient(ellipse, rgba(37,99,235,0.15) 0%, transparent 65%)" }} />
       <div className="max-w-3xl mx-auto relative">
 
         {/* Header */}
         <div className="text-center mb-6 sm:mb-8">
-          <div className="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/25 rounded-full px-4 py-2 mb-4 sm:mb-5">
-            <span className="w-2 h-2 bg-indigo-400 rounded-full animate-pulse" />
-            <span className="text-indigo-300 text-sm font-bold tracking-wide">FREE — No sign-up required</span>
+          <div className="inline-flex items-center gap-2 bg-blue-500/15 border border-blue-400/30 rounded-full px-4 py-2 mb-4 sm:mb-5">
+            <span className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" />
+            <span className="text-blue-200 text-sm font-bold tracking-wide">FREE — No sign-up required</span>
           </div>
-          <h2 className="text-2xl sm:text-4xl font-black text-white mb-3 tracking-tight">🎁 Free AI Lesson: Jasper AI</h2>
-          <p className="text-white/50 text-base max-w-lg mx-auto leading-relaxed">
+          <div className="flex items-center justify-center gap-3 mb-3">
+            <JasperLogo className="w-10 h-10 sm:w-12 sm:h-12" />
+            <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight text-left">Free AI Lesson: Jasper AI</h2>
+          </div>
+          <p className="text-slate-300 text-base max-w-lg mx-auto leading-relaxed">
             A complete, in-depth lesson on Jasper AI — what it is, how every feature works, real use cases, interactive exercises, and prompts. Same depth as the paid course.
           </p>
         </div>
 
-        {/* Section Tabs — scrollable row */}
+        {/* Section Tabs */}
         <div className="flex gap-2 overflow-x-auto pb-3 mb-5 sm:mb-6" style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}>
           {SECTIONS.map((s, i) => (
             <button
@@ -627,8 +800,8 @@ export default function FreeLessonSection({ onSignUp }) {
               onClick={() => setActiveSection(i)}
               className={`shrink-0 px-3 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 border flex items-center gap-1.5 ${
                 activeSection === i
-                  ? "bg-indigo-500/20 border-indigo-500/50 text-indigo-300"
-                  : "bg-white/3 border-white/8 text-white/35 hover:text-white/55 hover:border-white/15"
+                  ? "bg-blue-500/25 border-blue-400/60 text-blue-100"
+                  : "bg-white/5 border-white/10 text-slate-400 hover:text-slate-200 hover:border-white/20"
               }`}
             >
               <span>{s.emoji}</span>
@@ -639,22 +812,23 @@ export default function FreeLessonSection({ onSignUp }) {
         </div>
 
         {/* Lesson Card */}
-        <div className="border border-indigo-500/20 rounded-2xl overflow-hidden shadow-[0_0_60px_rgba(99,102,241,0.07)]">
+        <div className="border border-blue-400/25 rounded-2xl overflow-hidden shadow-[0_0_60px_rgba(37,99,235,0.15)]" style={{ background: "rgba(15,30,60,0.6)" }}>
 
           {/* Tool Header */}
-          <div className="flex items-center gap-3 sm:gap-4 px-4 sm:px-6 py-4 border-b border-white/6"
-            style={{ background: "linear-gradient(135deg, rgba(99,102,241,0.12), rgba(99,102,241,0.04))" }}>
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-rose-600 flex items-center justify-center text-xl shrink-0">✍️</div>
+          <div className="flex items-center gap-3 sm:gap-4 px-4 sm:px-6 py-4 border-b border-white/8"
+            style={{ background: "linear-gradient(135deg, rgba(37,99,235,0.18), rgba(37,99,235,0.05))" }}>
+            <JasperLogo className="w-10 h-10 shrink-0" />
             <div className="flex-1 min-w-0">
               <p className="text-white font-black text-base">Jasper AI — {section.tab}</p>
-              <p className="text-indigo-300/70 text-sm mt-0.5 truncate">{section.title}</p>
+              <p className="text-blue-200/80 text-sm mt-0.5 truncate">{section.title}</p>
             </div>
             <div className="hidden sm:flex items-center gap-2 shrink-0">
               <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full border ${
-                section.level === "Quiz" ? "bg-yellow-500/15 text-yellow-400 border-yellow-500/30" :
-                section.level === "Prompts" ? "bg-purple-500/15 text-purple-400 border-purple-500/30" :
-                section.level === "Intermediate" ? "bg-amber-500/15 text-amber-400 border-amber-500/30" :
-                "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"
+                section.level === "Quiz" ? "bg-blue-500/15 text-blue-200 border-blue-400/40" :
+                section.level === "Prompts" ? "bg-indigo-500/15 text-indigo-200 border-indigo-400/40" :
+                section.level === "Advanced" ? "bg-red-500/15 text-red-300 border-red-400/40" :
+                section.level === "Intermediate" ? "bg-amber-500/15 text-amber-300 border-amber-400/40" :
+                "bg-emerald-500/15 text-emerald-300 border-emerald-400/40"
               }`}>{section.level}</span>
             </div>
           </div>
@@ -667,16 +841,16 @@ export default function FreeLessonSection({ onSignUp }) {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.22 }}
             >
-              <div className="p-5 sm:p-7" style={{ background: "rgba(255,255,255,0.015)" }}>
+              <div className="p-5 sm:p-7">
                 <h3 className="text-white font-black text-base sm:text-lg mb-5 leading-tight">{section.title}</h3>
                 <SectionContent section={section} />
 
                 {/* Navigation */}
-                <div className="flex items-center justify-between pt-6 mt-6 border-t border-white/5">
+                <div className="flex items-center justify-between pt-6 mt-6 border-t border-white/8">
                   <button
                     onClick={() => setActiveSection(Math.max(0, activeSection - 1))}
                     disabled={activeSection === 0}
-                    className="flex items-center gap-1 text-white/25 hover:text-white/60 disabled:opacity-20 transition-colors text-xs font-semibold"
+                    className="flex items-center gap-1 text-slate-400 hover:text-blue-300 disabled:opacity-20 transition-colors text-xs font-semibold"
                   >
                     <ChevronLeft className="w-4 h-4" /> Prev
                   </button>
@@ -684,7 +858,7 @@ export default function FreeLessonSection({ onSignUp }) {
                   <div className="flex items-center gap-1.5">
                     {SECTIONS.map((_, i) => (
                       <button key={i} onClick={() => setActiveSection(i)}
-                        className={`rounded-full transition-all duration-200 ${i === activeSection ? "w-5 h-1.5 bg-indigo-500" : "w-1.5 h-1.5 bg-white/15 hover:bg-white/30"}`}
+                        className={`rounded-full transition-all duration-200 ${i === activeSection ? "w-5 h-1.5 bg-blue-400" : "w-1.5 h-1.5 bg-white/15 hover:bg-white/30"}`}
                       />
                     ))}
                   </div>
@@ -692,7 +866,7 @@ export default function FreeLessonSection({ onSignUp }) {
                   <button
                     onClick={() => setActiveSection(Math.min(SECTIONS.length - 1, activeSection + 1))}
                     disabled={activeSection === SECTIONS.length - 1}
-                    className="flex items-center gap-1 text-white/25 hover:text-white/60 disabled:opacity-20 transition-colors text-xs font-semibold"
+                    className="flex items-center gap-1 text-slate-400 hover:text-blue-300 disabled:opacity-20 transition-colors text-xs font-semibold"
                   >
                     Next <ChevronRight className="w-4 h-4" />
                   </button>
@@ -702,15 +876,15 @@ export default function FreeLessonSection({ onSignUp }) {
           </AnimatePresence>
 
           {/* Soft CTA */}
-          <div className="px-6 sm:px-8 py-5 border-t border-white/6 flex flex-col sm:flex-row items-center gap-4"
-            style={{ background: "linear-gradient(135deg, rgba(99,102,241,0.08), rgba(0,0,0,0))" }}>
+          <div className="px-6 sm:px-8 py-5 border-t border-white/8 flex flex-col sm:flex-row items-center gap-4"
+            style={{ background: "linear-gradient(135deg, rgba(37,99,235,0.15), rgba(15,30,60,0.4))" }}>
             <div className="flex-1 text-center sm:text-left">
-              <p className="text-white/60 text-xs font-semibold">This is exactly what the paid course looks like — interactive, in-depth, hands-on.</p>
-              <p className="text-white/25 text-[11px] mt-0.5">9 more tools. 60+ interactive lessons. 10 certificates. All for ₹500.</p>
+              <p className="text-slate-200 text-xs font-semibold">This is exactly what the paid course looks like — interactive, in-depth, hands-on.</p>
+              <p className="text-slate-400 text-[11px] mt-0.5">9 more tools. 60+ interactive lessons. 10 certificates. All for ₹500.</p>
             </div>
             <button onClick={onSignUp}
-              className="shrink-0 text-black font-black text-sm py-3 px-7 rounded-xl"
-              style={{ background: "linear-gradient(135deg, #34d399, #10b981)", boxShadow: "0 0 30px rgba(52,211,153,0.25)" }}>
+              className="shrink-0 text-white font-black text-sm py-3 px-7 rounded-xl shadow-lg shadow-blue-500/30 hover:scale-[1.02] transition-transform"
+              style={{ background: "linear-gradient(135deg, #2563EB, #1E40AF)" }}>
               🚀 Sign Up Free — Get All 10 Tools →
             </button>
           </div>
